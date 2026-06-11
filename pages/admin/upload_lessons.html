@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Upload Lessons - Edunova Admin</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .page-header {
+            margin-bottom: 25px;
+        }
+        
+        .page-header h1 {
+            font-size: 1.75rem;
+            margin-bottom: 8px;
+        }
+        
+        .form-section {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .form-section h3 {
+            font-size: 1.125rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .lesson-type-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .type-card {
+            border: 2px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .type-card:hover {
+            border-color: var(--primary);
+            background: #f8f7fc;
+            transform: translateY(-2px);
+        }
+        
+        .type-card.selected {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, #f0ebff, #f8f7fc);
+        }
+        
+        .type-card i {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+        
+        .file-upload-area {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius-xl);
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .file-upload-area:hover {
+            border-color: var(--primary);
+            background: #f8f7fc;
+        }
+        
+        .file-upload-area i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .recent-lessons {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .recent-lesson-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.3s;
+        }
+        
+        .recent-lesson-item:hover {
+            background: #fafbfc;
+        }
+        
+        .recent-lesson-thumb {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius-lg);
+            background: linear-gradient(135deg, #f0e6ff, #e8ddff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .tips-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .tips-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .tips-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .tips-list i {
+            color: var(--success);
+            width: 20px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .loading-spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            z-index: 3000;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .youtube-preview {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f7fc;
+            border-radius: var(--radius-lg);
+            display: none;
+        }
+        
+        .youtube-preview iframe {
+            width: 100%;
+            height: 200px;
+            border-radius: var(--radius-lg);
+        }
+        
+        @media (max-width: 1024px) {
+            .lesson-type-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div>
+            <div class="sidebar-header">
+                <i class="fas fa-graduation-cap"></i>
+                <h2>Edunova<br><span>Admin Panel</span></h2>
+            </div>
+            <nav class="sidebar-menu">
+                <div class="menu-item" data-page="dashboard">
+                    <i class="fas fa-house"></i> Dashboard
+                </div>
+                <div class="menu-item" data-page="students">
+                    <i class="fas fa-users"></i> Manage Students
+                </div>
+                <div class="menu-item" data-page="courses">
+                    <i class="fas fa-book-open"></i> Manage Courses
+                </div>
+                <div class="menu-item active" data-page="lessons">
+                    <i class="fas fa-video"></i> Upload Lessons
+                </div>
+                <div class="menu-item" data-page="quizzes">
+                    <i class="fas fa-question-circle"></i> Manage Quizzes
+                </div>
+                <div class="menu-item" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </div>
+            </nav>
+        </div>
+        <div class="upgrade-card">
+            <h3><i class="fas fa-chart-line"></i> Statistics</h3>
+            <div style="margin-top: 15px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span>Total Lessons</span>
+                    <strong id="totalLessonsCount">0</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span>Published</span>
+                    <strong id="publishedLessonsCount">0</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Total Views</span>
+                    <strong id="totalViewsCount">0</strong>
+                </div>
+            </div>
+            <hr style="margin: 15px 0; border-color: var(--border);">
+            <h3><i class="fas fa-lightbulb"></i> Upload Tips</h3>
+            <ul class="tips-list" style="text-align: left; font-size: 0.7rem;">
+                <li><i class="fas fa-check-circle"></i> Use high-quality videos</li>
+                <li><i class="fas fa-check-circle"></i> Keep lessons 5-30 min</li>
+                <li><i class="fas fa-check-circle"></i> Add YouTube links for videos</li>
+                <li><i class="fas fa-check-circle"></i> Max file size: 500MB</li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="menu-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Search lessons...">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="notification" onclick="openNotificationsModal()">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="notificationBadge">0</span>
+                </div>
+                <div class="profile">
+                    <img src="../../uploads/profiles/admin.jpg" alt="Profile" class="profile-img" onerror="this.src='https://ui-avatars.com/api/?name=Admin&background=5B34F2&color=fff'">
+                    <div class="profile-info">
+                        <h4 id="adminName">Admin User</h4>
+                        <p>Super Admin</p>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <div class="page-header">
+                <h1>Upload Lessons</h1>
+                <p>Create and upload lessons for your courses with YouTube integration</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 350px; gap: 25px;">
+                <!-- Left: Upload Form -->
+                <div>
+                    <!-- Select Course -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-book"></i> Select Course</h3>
+                        <select class="form-input" id="courseSelect" style="width: 100%;">
+                            <option value="">-- Select a course --</option>
+                        </select>
+                        <div id="courseLoading" style="display: none;" class="loading-spinner"></div>
+                    </div>
+
+                    <!-- Lesson Information -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-info-circle"></i> Lesson Information</h3>
+                        <div class="form-group">
+                            <label class="form-label">Lesson Title *</label>
+                            <input type="text" class="form-input" id="lessonTitle" placeholder="Enter lesson title">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Module/Section</label>
+                                <input type="text" class="form-input" id="moduleName" placeholder="e.g., Module 1: Introduction">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Order Number</label>
+                                <input type="number" class="form-input" id="lessonOrder" placeholder="1" value="1">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-textarea" id="lessonDescription" rows="3" placeholder="Enter lesson description"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Lesson Type Selection -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-tag"></i> Lesson Type</h3>
+                        <div class="lesson-type-cards">
+                            <div class="type-card selected" data-type="youtube" onclick="selectLessonType('youtube')">
+                                <i class="fab fa-youtube"></i>
+                                <div>YouTube Video</div>
+                            </div>
+                            <div class="type-card" data-type="video" onclick="selectLessonType('video')">
+                                <i class="fas fa-video"></i>
+                                <div>Upload Video</div>
+                            </div>
+                            <div class="type-card" data-type="document" onclick="selectLessonType('document')">
+                                <i class="fas fa-file-alt"></i>
+                                <div>Document</div>
+                            </div>
+                            <div class="type-card" data-type="text" onclick="selectLessonType('text')">
+                                <i class="fas fa-align-left"></i>
+                                <div>Text Lesson</div>
+                            </div>
+                        </div>
+
+                        <!-- YouTube URL Field -->
+                        <div id="youtubeField" class="form-group">
+                            <label class="form-label">YouTube URL</label>
+                            <input type="text" class="form-input" id="youtubeUrl" placeholder="https://www.youtube.com/watch?v=..." oninput="previewYouTube()">
+                            <small style="color: var(--gray); display: block; margin-top: 5px;">Supports: youtube.com/watch, youtu.be, youtube.com/embed</small>
+                            <div id="youtubePreview" class="youtube-preview"></div>
+                        </div>
+
+                        <!-- Video Upload Field -->
+                        <div id="videoField" class="form-group" style="display: none;">
+                            <label class="form-label">Upload Video</label>
+                            <div class="file-upload-area" onclick="document.getElementById('videoFile').click()">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Click to upload video file</p>
+                                <small>MP4, MOV, WebM (Max 500MB)</small>
+                                <input type="file" id="videoFile" accept="video/mp4,video/webm,video/quicktime" style="display: none;" onchange="handleVideoFile(this)">
+                            </div>
+                            <div id="videoUploadProgress" class="progress-bar" style="display: none;">
+                                <div class="progress-fill" id="videoProgressFill"></div>
+                            </div>
+                            <div id="videoFileName" style="margin-top: 10px; font-size: 0.75rem; color: var(--gray);"></div>
+                        </div>
+
+                        <!-- Document Upload Field -->
+                        <div id="documentField" class="form-group" style="display: none;">
+                            <label class="form-label">Upload Document</label>
+                            <div class="file-upload-area" onclick="document.getElementById('docFile').click()">
+                                <i class="fas fa-file-pdf"></i>
+                                <p>Click to upload document</p>
+                                <small>PDF, DOC, DOCX, PPT, PPTX (Max 100MB)</small>
+                                <input type="file" id="docFile" accept=".pdf,.doc,.docx,.ppt,.pptx" style="display: none;" onchange="handleDocFile(this)">
+                            </div>
+                            <div id="docUploadProgress" class="progress-bar" style="display: none;">
+                                <div class="progress-fill" id="docProgressFill"></div>
+                            </div>
+                            <div id="docFileName" style="margin-top: 10px; font-size: 0.75rem; color: var(--gray);"></div>
+                        </div>
+
+                        <!-- Text Content Field -->
+                        <div id="textField" class="form-group" style="display: none;">
+                            <label class="form-label">Lesson Content</label>
+                            <textarea class="form-textarea" id="lessonContent" rows="8" placeholder="Write your lesson content here..."></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Duration (minutes)</label>
+                                <input type="number" class="form-input" id="lessonDuration" placeholder="e.g., 15">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Status</label>
+                                <select class="form-input" id="lessonStatus">
+                                    <option value="draft">Draft</option>
+                                    <option value="published">Published</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div style="display: flex; gap: 15px; justify-content: flex-end;">
+                        <button class="btn btn-outline" onclick="resetForm()">Reset</button>
+                        <button class="btn btn-primary" id="uploadBtn" onclick="uploadLesson()">
+                            <i class="fas fa-cloud-upload-alt"></i> Upload Lesson
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right: Recent Lessons & Tips -->
+                <div>
+                    <!-- Recent Lessons -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-clock"></i> Recent Lessons</h3>
+                        <div class="recent-lessons" id="recentLessons">
+                            <div class="loading-text" style="text-align: center; padding: 20px;">Loading lessons...</div>
+                        </div>
+                    </div>
+
+                    <!-- Stats Card -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-chart-simple"></i> Quick Stats</h3>
+                        <div style="text-align: center;">
+                            <div style="font-size: 2rem; font-weight: 700; color: var(--primary);" id="quickTotal">0</div>
+                            <div style="font-size: 0.75rem; color: var(--gray);">Total Lessons</div>
+                        </div>
+                        <div style="display: flex; justify-content: space-around; margin-top: 20px;">
+                            <div style="text-align: center;">
+                                <div style="font-weight: 700;" id="quickPublished">0</div>
+                                <div style="font-size: 0.7rem;">Published</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-weight: 700;" id="quickDraft">0</div>
+                                <div style="font-size: 0.7rem;">Draft</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Notifications Modal -->
+<div class="modal" id="notificationsModal">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <h3><i class="fas fa-bell"></i> Notifications</h3>
+            <span class="close-modal" onclick="closeNotificationsModal()">&times;</span>
+        </div>
+        <div id="notificationsList" style="max-height: 400px; overflow-y: auto;">
+            <div class="loading-text">Loading notifications...</div>
+        </div>
+        <div style="padding: 15px; text-align: center; border-top: 1px solid var(--border);">
+            <button class="btn btn-outline btn-sm" onclick="markAllNotificationsRead()">Mark All as Read</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============================================
+    // UPLOAD LESSONS - FULL API INTEGRATION
+    // ============================================
+    
+    const API_BASE = 'http://localhost/edunova/api';
+    let lessonsData = [];
+    let coursesList = [];
+    let editingLessonId = null;
+    let selectedType = 'youtube';
+    let uploadedVideoUrl = null;
+    let uploadedDocUrl = null;
+    
+    // ============================================
+    // Helper Functions
+    // ============================================
+    
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('open');
+    }
+    
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.style.background = type === 'success' ? '#22c55e' : type === 'error' ? '#ef4444' : '#333';
+        toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    function formatDate(dateString) {
+        if (!dateString) return 'N/A';
+        return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+    
+    function extractYouTubeId(url) {
+        if (!url) return null;
+        const patterns = [
+            /(?:youtube\.com\/watch\?v=)([^&]+)/,
+            /(?:youtu\.be\/)([^?]+)/,
+            /(?:youtube\.com\/embed\/)([^?]+)/,
+            /(?:youtube\.com\/shorts\/)([^?]+)/
+        ];
+        
+        for (const pattern of patterns) {
+            const match = url.match(pattern);
+            if (match) {
+                return match[1];
+            }
+        }
+        return null;
+    }
+    
+    function previewYouTube() {
+        const url = document.getElementById('youtubeUrl').value;
+        const previewDiv = document.getElementById('youtubePreview');
+        const videoId = extractYouTubeId(url);
+        
+        if (videoId) {
+            previewDiv.style.display = 'block';
+            previewDiv.innerHTML = `
+                <iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>
+                <small style="display: block; margin-top: 8px;">Preview - Video will play in course player</small>
+            `;
+        } else {
+            previewDiv.style.display = 'none';
+            previewDiv.innerHTML = '';
+        }
+    }
+    
+    // ============================================
+    // API Calls
+    // ============================================
+    
+    async function fetchCourses() {
+        const token = localStorage.getItem('edunova_token');
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        try {
+            const response = await fetch(`${API_BASE}/admin/get_courses_list.php`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                coursesList = data.courses || [];
+                populateCourseSelect();
+            } else if (response.status === 401) {
+                window.location.href = 'login.html';
+            }
+        } catch (error) {
+            console.error('Error fetching courses:', error);
+        }
+    }
+    
+    function populateCourseSelect() {
+        const select = document.getElementById('courseSelect');
+        select.innerHTML = '<option value="">-- Select a course --</option>';
+        
+        coursesList.forEach(course => {
+            select.innerHTML += `<option value="${course.id}">${escapeHtml(course.title)}</option>`;
+        });
+    }
+    
+    async function fetchLessons() {
+        const token = localStorage.getItem('edunova_token');
+        
+        try {
+            const response = await fetch(`${API_BASE}/admin/get_lessons.php`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                lessonsData = data.lessons || [];
+                renderRecentLessons();
+                updateStats();
+            }
+        } catch (error) {
+            console.error('Error fetching lessons:', error);
+            document.getElementById('recentLessons').innerHTML = '<div class="loading-text" style="text-align: center; padding: 20px;">Failed to load lessons</div>';
+        }
+    }
+    
+    function updateStats() {
+        const total = lessonsData.length;
+        const published = lessonsData.filter(l => l.status === 'published').length;
+        const draft = lessonsData.filter(l => l.status === 'draft').length;
+        const totalViews = lessonsData.reduce((sum, l) => sum + (l.views || 0), 0);
+        
+        document.getElementById('totalLessonsCount').innerText = total;
+        document.getElementById('publishedLessonsCount').innerText = published;
+        document.getElementById('totalViewsCount').innerText = totalViews.toLocaleString();
+        document.getElementById('quickTotal').innerText = total;
+        document.getElementById('quickPublished').innerText = published;
+        document.getElementById('quickDraft').innerText = draft;
+    }
+    
+    function renderRecentLessons() {
+        const container = document.getElementById('recentLessons');
+        
+        if (!lessonsData || lessonsData.length === 0) {
+            container.innerHTML = '<div class="loading-text" style="text-align: center; padding: 20px;">No lessons found</div>';
+            return;
+        }
+        
+        const recent = lessonsData.slice(0, 5);
+        container.innerHTML = recent.map(lesson => {
+            let icon = '<i class="fab fa-youtube" style="color: #ff0000;"></i>';
+            if (lesson.type === 'video') icon = '<i class="fas fa-video" style="color: var(--primary);"></i>';
+            if (lesson.type === 'document') icon = '<i class="fas fa-file-alt" style="color: #22c55e;"></i>';
+            if (lesson.type === 'text') icon = '<i class="fas fa-align-left" style="color: #f59e0b;"></i>';
+            
+            return `
+                <div class="recent-lesson-item">
+                    <div class="recent-lesson-thumb">${icon}</div>
+                    <div style="flex: 1;">
+                        <div><strong>${escapeHtml(lesson.title)}</strong></div>
+                        <div style="font-size: 0.7rem; color: var(--gray);">
+                            ${escapeHtml(lesson.course_title || 'Unknown Course')} • ${lesson.duration || 0} min • ${lesson.status === 'published' ? 'Published' : 'Draft'}
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="action-btn edit" onclick="editLesson(${lesson.id})" title="Edit"><i class="fas fa-edit"></i></button>
+                        <button class="action-btn delete" onclick="deleteLesson(${lesson.id})" title="Delete"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // ============================================
+    // File Upload Handlers
+    // ============================================
+    
+    function handleVideoFile(input) {
+        const file = input.files[0];
+        if (!file) return;
+        
+        const validTypes = ['video/mp4', 'video/webm', 'video/quicktime'];
+        if (!validTypes.includes(file.type)) {
+            showToast('Please upload MP4, WebM, or MOV files', 'error');
+            return;
+        }
+        
+        if (file.size > 500 * 1024 * 1024) {
+            showToast('File too large. Max 500MB', 'error');
+            return;
+        }
+        
+        document.getElementById('videoFileName').innerHTML = `<i class="fas fa-spinner fa-pulse"></i> Uploading ${file.name}...`;
+        document.getElementById('videoUploadProgress').style.display = 'block';
+        
+        simulateUpload(file, (progress) => {
+            document.getElementById('videoProgressFill').style.width = `${progress}%`;
+        }, (url) => {
+            uploadedVideoUrl = url;
+            document.getElementById('videoFileName').innerHTML = `<i class="fas fa-check-circle" style="color: var(--success);"></i> ${file.name} uploaded successfully`;
+            setTimeout(() => {
+                document.getElementById('videoUploadProgress').style.display = 'none';
+            }, 1000);
+        });
+    }
+    
+    function handleDocFile(input) {
+        const file = input.files[0];
+        if (!file) return;
+        
+        const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation'];
+        if (!validTypes.includes(file.type)) {
+            showToast('Please upload PDF, DOC, DOCX, PPT, or PPTX files', 'error');
+            return;
+        }
+        
+        if (file.size > 100 * 1024 * 1024) {
+            showToast('File too large. Max 100MB', 'error');
+            return;
+        }
+        
+        document.getElementById('docFileName').innerHTML = `<i class="fas fa-spinner fa-pulse"></i> Uploading ${file.name}...`;
+        document.getElementById('docUploadProgress').style.display = 'block';
+        
+        simulateUpload(file, (progress) => {
+            document.getElementById('docProgressFill').style.width = `${progress}%`;
+        }, (url) => {
+            uploadedDocUrl = url;
+            document.getElementById('docFileName').innerHTML = `<i class="fas fa-check-circle" style="color: var(--success);"></i> ${file.name} uploaded successfully`;
+            setTimeout(() => {
+                document.getElementById('docUploadProgress').style.display = 'none';
+            }, 1000);
+        });
+    }
+    
+    function simulateUpload(file, onProgress, onComplete) {
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += 10;
+            onProgress(progress);
+            if (progress >= 100) {
+                clearInterval(interval);
+                const fakeUrl = URL.createObjectURL(file);
+                onComplete(fakeUrl);
+            }
+        }, 200);
+    }
+    
+    // ============================================
+    // Lesson CRUD Operations
+    // ============================================
+    
+    function selectLessonType(type) {
+        selectedType = type;
+        
+        document.querySelectorAll('.type-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        document.querySelector(`.type-card[data-type="${type}"]`).classList.add('selected');
+        
+        document.getElementById('youtubeField').style.display = type === 'youtube' ? 'block' : 'none';
+        document.getElementById('videoField').style.display = type === 'video' ? 'block' : 'none';
+        document.getElementById('documentField').style.display = type === 'document' ? 'block' : 'none';
+        document.getElementById('textField').style.display = type === 'text' ? 'block' : 'none';
+        
+        if (type !== 'youtube') {
+            document.getElementById('youtubePreview').style.display = 'none';
+        }
+    }
+    
+    async function uploadLesson() {
+        const courseId = document.getElementById('courseSelect').value;
+        const title = document.getElementById('lessonTitle').value;
+        const moduleName = document.getElementById('moduleName').value;
+        const order = parseInt(document.getElementById('lessonOrder').value) || 1;
+        const description = document.getElementById('lessonDescription').value;
+        const duration = parseInt(document.getElementById('lessonDuration').value) || 0;
+        const status = document.getElementById('lessonStatus').value;
+        const content = document.getElementById('lessonContent').value;
+        
+        if (!courseId) {
+            showToast('Please select a course', 'error');
+            return;
+        }
+        
+        if (!title) {
+            showToast('Please enter a lesson title', 'error');
+            return;
+        }
+        
+        let lessonData = {
+            course_id: courseId,
+            title: title,
+            module_name: moduleName,
+            order_num: order,
+            description: description,
+            duration_minutes: duration,
+            status: status,
+            type: selectedType,
+            content: content
+        };
+        
+        if (selectedType === 'youtube') {
+            const youtubeUrl = document.getElementById('youtubeUrl').value;
+            const videoId = extractYouTubeId(youtubeUrl);
+            if (!videoId) {
+                showToast('Invalid YouTube URL', 'error');
+                return;
+            }
+            lessonData.youtube_url = youtubeUrl;
+            lessonData.video_id = videoId;
+        } else if (selectedType === 'video') {
+            if (!uploadedVideoUrl) {
+                showToast('Please upload a video file', 'error');
+                return;
+            }
+            lessonData.video_url = uploadedVideoUrl;
+        } else if (selectedType === 'document') {
+            if (!uploadedDocUrl) {
+                showToast('Please upload a document', 'error');
+                return;
+            }
+            lessonData.document_url = uploadedDocUrl;
+        }
+        
+        const token = localStorage.getItem('edunova_token');
+        const uploadBtn = document.getElementById('uploadBtn');
+        
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Uploading...';
+        
+        try {
+            const response = await fetch(`${API_BASE}/admin/add_lesson.php`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(lessonData)
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                showToast(`Lesson "${title}" uploaded successfully!`);
+                resetForm();
+                fetchLessons();
+            } else {
+                showToast(data.error || 'Failed to upload lesson', 'error');
+            }
+        } catch (error) {
+            showToast('Network error. Please try again.', 'error');
+        } finally {
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Upload Lesson';
+        }
+    }
+    
+    async function editLesson(id) {
+        const lesson = lessonsData.find(l => l.id === id);
+        if (lesson) {
+            editingLessonId = id;
+            document.getElementById('courseSelect').value = lesson.course_id;
+            document.getElementById('lessonTitle').value = lesson.title;
+            document.getElementById('moduleName').value = lesson.module_name || '';
+            document.getElementById('lessonOrder').value = lesson.order_num || 1;
+            document.getElementById('lessonDescription').value = lesson.description || '';
+            document.getElementById('lessonDuration').value = lesson.duration_minutes || 0;
+            document.getElementById('lessonStatus').value = lesson.status || 'draft';
+            document.getElementById('lessonContent').value = lesson.content || '';
+            
+            selectLessonType(lesson.type || 'youtube');
+            
+            if (lesson.type === 'youtube' && lesson.youtube_url) {
+                document.getElementById('youtubeUrl').value = lesson.youtube_url;
+                previewYouTube();
+            }
+            
+            document.getElementById('uploadBtn').innerHTML = '<i class="fas fa-save"></i> Update Lesson';
+            document.getElementById('uploadBtn').onclick = updateLesson;
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+    
+    async function updateLesson() {
+        const courseId = document.getElementById('courseSelect').value;
+        const title = document.getElementById('lessonTitle').value;
+        
+        if (!courseId || !title) {
+            showToast('Please fill in required fields', 'error');
+            return;
+        }
+        
+        const lessonData = {
+            id: editingLessonId,
+            course_id: courseId,
+            title: title,
+            module_name: document.getElementById('moduleName').value,
+            order_num: parseInt(document.getElementById('lessonOrder').value) || 1,
+            description: document.getElementById('lessonDescription').value,
+            duration_minutes: parseInt(document.getElementById('lessonDuration').value) || 0,
+            status: document.getElementById('lessonStatus').value,
+            type: selectedType,
+            content: document.getElementById('lessonContent').value
+        };
+        
+        if (selectedType === 'youtube') {
+            lessonData.youtube_url = document.getElementById('youtubeUrl').value;
+        }
+        
+        const token = localStorage.getItem('edunova_token');
+        const uploadBtn = document.getElementById('uploadBtn');
+        
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Updating...';
+        
+        try {
+            const response = await fetch(`${API_BASE}/admin/update_lesson.php`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(lessonData)
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                showToast(`Lesson "${title}" updated successfully!`);
+                resetForm();
+                fetchLessons();
+            } else {
+                showToast(data.error || 'Failed to update lesson', 'error');
+            }
+        } catch (error) {
+            showToast('Network error. Please try again.', 'error');
+        } finally {
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Upload Lesson';
+            uploadBtn.onclick = uploadLesson;
+            editingLessonId = null;
+        }
+    }
+    
+    async function deleteLesson(id) {
+        if (confirm('Are you sure you want to delete this lesson?')) {
+            const token = localStorage.getItem('edunova_token');
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/delete_lesson.php?id=${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showToast('Lesson deleted successfully');
+                    fetchLessons();
+                } else {
+                    showToast(data.error || 'Failed to delete lesson', 'error');
+                }
+            } catch (error) {
+                showToast('Network error. Please try again.', 'error');
+            }
+        }
+    }
+    
+    function resetForm() {
+        document.getElementById('lessonTitle').value = '';
+        document.getElementById('moduleName').value = '';
+        document.getElementById('lessonOrder').value = '1';
+        document.getElementById('lessonDescription').value = '';
+        document.getElementById('lessonDuration').value = '';
+        document.getElementById('youtubeUrl').value = '';
+        document.getElementById('lessonContent').value = '';
+        document.getElementById('videoFileName').innerHTML = '';
+        document.getElementById('docFileName').innerHTML = '';
+        document.getElementById('videoFile').value = '';
+        document.getElementById('docFile').value = '';
+        document.getElementById('youtubePreview').style.display = 'none';
+        document.getElementById('youtubePreview').innerHTML = '';
+        
+        selectLessonType('youtube');
+        
+        editingLessonId = null;
+        uploadedVideoUrl = null;
+        uploadedDocUrl = null;
+        
+        const uploadBtn = document.getElementById('uploadBtn');
+        uploadBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Upload Lesson';
+        uploadBtn.onclick = uploadLesson;
+        
+        showToast('Form reset', 'info');
+    }
+    
+    // ============================================
+    // Navigation & Notifications
+    // ============================================
+    
+    function getAdminName() {
+        const admin = localStorage.getItem('edunova_admin');
+        if (admin) {
+            try {
+                const adminData = JSON.parse(admin);
+                document.getElementById('adminName').innerText = adminData.name || 'Admin User';
+            } catch(e) {}
+        }
+    }
+    
+    function initNavigation() {
+        document.querySelectorAll('.menu-item[data-page]').forEach(item => {
+            item.addEventListener('click', () => {
+                const page = item.dataset.page;
+                if (page === 'dashboard') window.location.href = 'dashboard.html';
+                else if (page === 'students') window.location.href = 'manage_students.html';
+                else if (page === 'courses') window.location.href = 'manage_courses.html';
+                else if (page === 'quizzes') window.location.href = 'manage_quizzes.html';
+            });
+        });
+        
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('edunova_token');
+            localStorage.removeItem('edunova_user');
+            localStorage.removeItem('edunova_admin');
+            window.location.href = 'login.html';
+        });
+    }
+    
+    async function loadNotifications() {
+        const token = localStorage.getItem('edunova_token');
+        try {
+            const response = await fetch(`${API_BASE}/admin/get_notifications.php`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            if (data.success) {
+                const badge = document.getElementById('notificationBadge');
+                const unreadCount = data.unread_count || 0;
+                badge.innerText = unreadCount > 9 ? '9+' : unreadCount;
+                badge.style.display = unreadCount > 0 ? 'inline-flex' : 'none';
+            }
+        } catch (error) {
+            console.error('Error loading notifications:', error);
+        }
+    }
+    
+    function openNotificationsModal() {
+        const modal = document.getElementById('notificationsModal');
+        modal.classList.add('active');
+        loadNotificationsList();
+    }
+    
+    function closeNotificationsModal() {
+        document.getElementById('notificationsModal').classList.remove('active');
+    }
+    
+    async function loadNotificationsList() {
+        const token = localStorage.getItem('edunova_token');
+        const container = document.getElementById('notificationsList');
+        
+        try {
+            const response = await fetch(`${API_BASE}/admin/get_notifications.php`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            
+            if (data.success && data.notifications && data.notifications.length > 0) {
+                container.innerHTML = data.notifications.map(notif => `
+                    <div style="padding: 12px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 12px;">
+                        <div style="width: 36px; height: 36px; background: #f0e6ff; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #5b34ea;">
+                            <i class="fas ${notif.type === 'lesson' ? 'fa-video' : 'fa-bell'}"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 0.875rem; font-weight: 600; margin-bottom: 4px;">${escapeHtml(notif.title)}</div>
+                            <div style="font-size: 0.7rem; color: var(--gray);">${new Date(notif.created_at).toLocaleDateString()}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<div class="loading-text">No notifications</div>';
+            }
+        } catch (error) {
+            container.innerHTML = '<div class="loading-text">Error loading notifications</div>';
+        }
+    }
+    
+    function markAllNotificationsRead() {
+        document.getElementById('notificationBadge').innerText = '0';
+        closeNotificationsModal();
+        showToast('All notifications marked as read');
+    }
+    
+    // ============================================
+    // Initialize
+    // ============================================
+    
+    function checkAuth() {
+        const token = localStorage.getItem('edunova_token');
+        const admin = localStorage.getItem('edunova_admin');
+        if (!token || !admin) {
+            window.location.href = 'login.html';
+            return false;
+        }
+        return true;
+    }
+    
+    window.onclick = function(event) {
+        const notifModal = document.getElementById('notificationsModal');
+        if (event.target === notifModal) closeNotificationsModal();
+    }
+    
+    async function init() {
+        if (!checkAuth()) return;
+        
+        getAdminName();
+        initNavigation();
+        selectLessonType('youtube');
+        
+        await fetchCourses();
+        await fetchLessons();
+        await loadNotifications();
+    }
+    
+    window.toggleSidebar = toggleSidebar;
+    window.selectLessonType = selectLessonType;
+    window.uploadLesson = uploadLesson;
+    window.updateLesson = updateLesson;
+    window.editLesson = editLesson;
+    window.deleteLesson = deleteLesson;
+    window.resetForm = resetForm;
+    window.previewYouTube = previewYouTube;
+    window.handleVideoFile = handleVideoFile;
+    window.handleDocFile = handleDocFile;
+    window.openNotificationsModal = openNotificationsModal;
+    window.closeNotificationsModal = closeNotificationsModal;
+    window.markAllNotificationsRead = markAllNotificationsRead;
+    
+    init();
+</script>
+
+<style>
+    .upgrade-card {
+        background: white;
+        border-radius: var(--radius-xl);
+        padding: 20px;
+        margin-top: 30px;
+    }
+    
+    .upgrade-card h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+    
+    .tips-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .tips-list li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 0;
+        font-size: 0.7rem;
+        border-bottom: 1px solid var(--border);
+    }
+    
+    .tips-list li:last-child {
+        border-bottom: none;
+    }
+    
+    .tips-list i {
+        color: var(--success);
+        width: 16px;
+    }
+    
+    .file-upload-area {
+        cursor: pointer;
+    }
+    
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 2000;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal.active {
+        display: flex;
+    }
+    
+    .modal-content {
+        background: white;
+        border-radius: var(--radius-xl);
+        width: 90%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    .modal-header {
+        padding: 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .close-modal {
+        cursor: pointer;
+        font-size: 1.25rem;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 5px;
+    }
+    
+    .action-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: none;
+        background: transparent;
+    }
+    
+    .action-btn:hover {
+        background: var(--border);
+    }
+    
+    .action-btn.edit { color: var(--primary); }
+    .action-btn.delete { color: var(--danger); }
+</style>
+
+</body>
+</html>

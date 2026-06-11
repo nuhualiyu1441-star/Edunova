@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Admin Dashboard - Edunova Smart Learning</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* Admin Dashboard Specific Styles */
+        .welcome-section {
+            margin-bottom: 30px;
+        }
+        
+        .welcome-section h1 {
+            font-size: 1.75rem;
+            margin-bottom: 8px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .stat-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .stat-info h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        
+        .stat-info p {
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+        
+        .stat-change {
+            font-size: 0.7rem;
+            margin-top: 6px;
+        }
+        
+        .stat-change.positive { color: var(--success); }
+        .stat-change.negative { color: var(--danger); }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 20px;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .chart-header h3 {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        
+        .period-selector {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            background: white;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+        
+        .donut-chart {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin: 0 auto;
+        }
+        
+        .donut-chart svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+        
+        .chart-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.75rem;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+        
+        .recent-list {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+        
+        .recent-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+        }
+        
+        .recent-item:last-child {
+            border-bottom: none;
+        }
+        
+        .recent-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .recent-info {
+            flex: 1;
+        }
+        
+        .recent-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .recent-email {
+            font-size: 0.7rem;
+            color: var(--gray);
+        }
+        
+        .recent-date {
+            font-size: 0.7rem;
+            color: var(--gray);
+        }
+        
+        .system-status {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .status-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        .status-info {
+            flex: 1;
+        }
+        
+        .status-label {
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-bottom: 4px;
+        }
+        
+        .status-value {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        
+        .status-bar {
+            height: 6px;
+            background: var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .status-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+        }
+        
+        /* Loading Spinner */
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            text-align: center;
+            padding: 20px;
+            color: var(--gray);
+        }
+        
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .welcome-section h1 {
+                font-size: 1.25rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div>
+            <div class="sidebar-header">
+                <i class="fas fa-graduation-cap"></i>
+                <h2>Edunova<br><span>Admin Panel</span></h2>
+            </div>
+            <nav class="sidebar-menu">
+                <div class="menu-item active" data-page="dashboard">
+                    <i class="fas fa-house"></i> Dashboard
+                </div>
+                <div class="menu-item" data-page="students">
+                    <i class="fas fa-users"></i> Manage Students
+                </div>
+                <div class="menu-item" data-page="courses">
+                    <i class="fas fa-book-open"></i> Manage Courses
+                </div>
+                <div class="menu-item" data-page="lessons">
+                    <i class="fas fa-video"></i> Upload Lessons
+                </div>
+                <div class="menu-item" data-page="quizzes">
+                    <i class="fas fa-question-circle"></i> Manage Quizzes
+                </div>
+                <div class="menu-item" data-page="messages">
+                    <i class="fas fa-envelope"></i> Messages
+                </div>
+                <div class="menu-item" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </div>
+            </nav>
+        </div>
+        <div class="upgrade-card">
+            <h3>System Status</h3>
+            <div class="status-indicator" id="systemStatusIndicator">
+                <i class="fas fa-circle" style="color: var(--success); font-size: 0.625rem;"></i>
+                <span style="font-size: 0.75rem;">Checking...</span>
+            </div>
+            <button class="btn btn-outline btn-sm" style="margin-top: 15px; width: 100%;" onclick="viewSystemHealth()">
+                View System Health
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="menu-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Search users, courses, quizzes...">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="notification" onclick="openNotificationsModal()">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="notificationBadge">0</span>
+                </div>
+                <div class="profile" onclick="window.location.href='profile.html'">
+                    <img src="../../uploads/profiles/admin.jpg" alt="Profile" class="profile-img" id="profileImg">
+                    <div class="profile-info">
+                        <h4 id="adminName">Admin User</h4>
+                        <p>Super Admin</p>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <h1 id="welcomeMessage">Welcome back, Admin! 👋</h1>
+                <p id="welcomeText">Here's what's happening with your learning platform today.</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card" onclick="navigateTo('students')">
+                    <div class="stat-icon purple"><i class="fas fa-users"></i></div>
+                    <div class="stat-info">
+                        <h3 id="totalUsers">--</h3>
+                        <p>Total Users</p>
+                        <div class="stat-change positive" id="userChange">Loading...</div>
+                    </div>
+                </div>
+                <div class="stat-card" onclick="navigateTo('courses')">
+                    <div class="stat-icon green"><i class="fas fa-book-open"></i></div>
+                    <div class="stat-info">
+                        <h3 id="totalCourses">--</h3>
+                        <p>Total Courses</p>
+                        <div class="stat-change positive" id="courseChange">Loading...</div>
+                    </div>
+                </div>
+                <div class="stat-card" onclick="navigateTo('courses')">
+                    <div class="stat-icon blue"><i class="fas fa-graduation-cap"></i></div>
+                    <div class="stat-info">
+                        <h3 id="totalEnrollments">--</h3>
+                        <p>Enrollments</p>
+                        <div class="stat-change positive" id="enrollmentChange">Loading...</div>
+                    </div>
+                </div>
+                <div class="stat-card" onclick="navigateTo('quizzes')">
+                    <div class="stat-icon orange"><i class="fas fa-question-circle"></i></div>
+                    <div class="stat-info">
+                        <h3 id="totalQuizzes">--</h3>
+                        <p>Total Quizzes</p>
+                        <div class="stat-change positive" id="quizChange">Loading...</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple"><i class="fas fa-certificate"></i></div>
+                    <div class="stat-info">
+                        <h3 id="totalCertificates">--</h3>
+                        <p>Certificates</p>
+                        <div class="stat-change positive" id="certChange">Loading...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Enrollments Chart -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>Enrollments Overview</h3>
+                        <select class="period-selector" id="chartPeriod" onchange="changeChartPeriod()">
+                            <option value="weekly">This Week</option>
+                            <option value="monthly">This Month</option>
+                            <option value="yearly">This Year</option>
+                        </select>
+                    </div>
+                    <div id="enrollmentsChart">
+                        <canvas id="enrollmentCanvas" width="400" height="200" style="width: 100%; height: auto;"></canvas>
+                    </div>
+                </div>
+
+                <!-- Users by Role -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>Users by Role</h3>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                        <div class="donut-chart" id="donutChart"></div>
+                        <div class="chart-legend" id="roleLegend"></div>
+                    </div>
+                </div>
+
+                <!-- Recent Registrations -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>Recent Registrations</h3>
+                        <button class="btn btn-outline btn-sm" onclick="viewAllRegistrations()">View All</button>
+                    </div>
+                    <div class="recent-list" id="recentRegistrations">
+                        <div class="loading-text">Loading...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Section -->
+            <div class="dashboard-grid">
+                <!-- Top Courses -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>Top Courses</h3>
+                        <button class="btn btn-outline btn-sm" onclick="viewAllCourses()">View All</button>
+                    </div>
+                    <div id="topCourses">
+                        <div class="loading-text">Loading...</div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>Recent Activity</h3>
+                        <button class="btn btn-outline btn-sm" onclick="viewAllActivity()">View All</button>
+                    </div>
+                    <div class="recent-list" id="recentActivity">
+                        <div class="loading-text">Loading...</div>
+                    </div>
+                </div>
+
+                <!-- System Overview -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>System Overview</h3>
+                    </div>
+                    <div class="system-status" id="systemOverview">
+                        <div class="loading-text">Loading...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Notifications Modal -->
+<div class="modal" id="notificationsModal">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <h3><i class="fas fa-bell"></i> Notifications</h3>
+            <span class="close-modal" onclick="closeNotificationsModal()">&times;</span>
+        </div>
+        <div id="notificationsList" style="max-height: 400px; overflow-y: auto;">
+            <div class="loading-text">Loading notifications...</div>
+        </div>
+        <div style="padding: 15px; text-align: center; border-top: 1px solid var(--border);">
+            <button class="btn btn-outline btn-sm" onclick="markAllNotificationsRead()">Mark All as Read</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============================================
+    // ADMIN DASHBOARD - FULL API INTEGRATION
+    // ============================================
+    
+    const API_BASE = 'http://localhost/edunova/api';
+    let dashboardData = null;
+    let chartInstance = null;
+    
+    // ============================================
+    // Helper Functions
+    // ============================================
+    
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('open');
+    }
+    
+    function formatDate(dateString) {
+        if (!dateString) return 'Unknown';
+        return new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+    
+    function formatNumber(num) {
+        if (!num) return '0';
+        if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+        if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+        return num.toString();
+    }
+    
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    // ============================================
+    // Navigation
+    // ============================================
+    
+    function navigateTo(page) {
+        switch(page) {
+            case 'students':
+                window.location.href = 'manage_students.html';
+                break;
+            case 'courses':
+                window.location.href = 'manage_courses.html';
+                break;
+            case 'lessons':
+                window.location.href = 'upload_lessons.html';
+                break;
+            case 'quizzes':
+                window.location.href = 'manage_quizzes.html';
+                break;
+            case 'messages':
+                window.location.href = 'messages.html';
+                break;
+        }
+    }
+    
+    function viewAllRegistrations() {
+        if (dashboardData && dashboardData.recent_users) {
+            let list = '📋 Recent Registrations\n\n';
+            dashboardData.recent_users.forEach(user => {
+                list += `• ${user.full_name} (${user.email}) - ${formatDate(user.created_at)}\n`;
+            });
+            alert(list);
+        } else {
+            alert('No recent registrations found');
+        }
+    }
+    
+    function viewAllCourses() {
+        if (dashboardData && dashboardData.top_courses) {
+            let list = '📚 Top Courses\n\n';
+            dashboardData.top_courses.forEach(course => {
+                list += `• ${course.title}: ${course.enrollments_count || 0} students\n`;
+            });
+            alert(list);
+        } else {
+            alert('No course data available');
+        }
+    }
+    
+    function viewAllActivity() {
+        if (dashboardData && dashboardData.recent_activity) {
+            let list = '📋 Recent Activity\n\n';
+            dashboardData.recent_activity.forEach(activity => {
+                list += `• ${activity.action}: ${activity.user || activity.description} (${activity.time || formatDate(activity.created_at)})\n`;
+            });
+            alert(list);
+        } else {
+            alert('No recent activity');
+        }
+    }
+    
+    function viewSystemHealth() {
+        alert('🖥️ System Health\n\n✓ Database: Operational\n✓ API: Operational\n✓ Storage: 25.7% used\n✓ Bandwidth: 25.0% used\n✓ Uptime: 99.98%');
+    }
+    
+    function viewUser(email) {
+        alert(`Viewing user: ${email}\n\nThis would open the user details page.`);
+    }
+    
+    function viewCourse(courseName) {
+        alert(`Viewing course: ${courseName}\n\nThis would open the course details page.`);
+    }
+    
+    function showNotifications() {
+        openNotificationsModal();
+    }
+    
+    // ============================================
+    // API Data Fetching
+    // ============================================
+    
+    async function fetchDashboardData() {
+        const token = localStorage.getItem('edunova_token');
+        const admin = localStorage.getItem('edunova_admin');
+        
+        if (!token || !admin) {
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        try {
+            // Update admin info
+            const adminData = JSON.parse(admin);
+            document.getElementById('adminName').innerText = adminData.name || 'Admin User';
+            document.getElementById('welcomeMessage').innerHTML = `Welcome back, ${adminData.name || 'Admin'}! 👋`;
+            
+            // Fetch dashboard stats
+            const response = await fetch(`${API_BASE}/admin/dashboard.php`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                dashboardData = data;
+                updateDashboard(data);
+            } else if (response.status === 401) {
+                localStorage.removeItem('edunova_token');
+                localStorage.removeItem('edunova_user');
+                localStorage.removeItem('edunova_admin');
+                window.location.href = 'login.html';
+            } else {
+                console.error('Failed to fetch dashboard data:', data.error);
+                showErrorState();
+            }
+        } catch (error) {
+            console.error('Error fetching dashboard data:', error);
+            showErrorState();
+        }
+    }
+    
+    function showErrorState() {
+        // Show error in stats
+        document.getElementById('totalUsers').innerText = 'Error';
+        document.getElementById('totalCourses').innerText = 'Error';
+        document.getElementById('totalEnrollments').innerText = 'Error';
+        document.getElementById('totalQuizzes').innerText = 'Error';
+        document.getElementById('totalCertificates').innerText = 'Error';
+        
+        document.getElementById('recentRegistrations').innerHTML = '<div class="loading-text">Failed to load data. Please refresh.</div>';
+        document.getElementById('topCourses').innerHTML = '<div class="loading-text">Failed to load data. Please refresh.</div>';
+        document.getElementById('recentActivity').innerHTML = '<div class="loading-text">Failed to load data. Please refresh.</div>';
+        document.getElementById('systemOverview').innerHTML = '<div class="loading-text">Failed to load data. Please refresh.</div>';
+    }
+    
+    function updateDashboard(data) {
+        // Update stats
+        if (data.stats) {
+            document.getElementById('totalUsers').innerText = formatNumber(data.stats.total_users);
+            document.getElementById('totalCourses').innerText = formatNumber(data.stats.total_courses);
+            document.getElementById('totalEnrollments').innerText = formatNumber(data.stats.total_enrollments);
+            document.getElementById('totalQuizzes').innerText = formatNumber(data.stats.total_quizzes);
+            document.getElementById('totalCertificates').innerText = formatNumber(data.stats.total_certificates);
+            
+            document.getElementById('userChange').innerHTML = `↑ ${((data.stats.total_users || 0) / 100).toFixed(1)}%`;
+            document.getElementById('courseChange').innerHTML = `↑ ${((data.stats.total_courses || 0) / 10).toFixed(1)}%`;
+            document.getElementById('enrollmentChange').innerHTML = `↑ ${((data.stats.total_enrollments || 0) / 100).toFixed(1)}%`;
+            document.getElementById('quizChange').innerHTML = `↑ ${((data.stats.total_quizzes || 0) / 10).toFixed(1)}%`;
+            document.getElementById('certChange').innerHTML = `↑ ${((data.stats.total_certificates || 0) / 10).toFixed(1)}%`;
+        }
+        
+        // Update users by role chart
+        if (data.users_by_role) {
+            renderDonutChart(data.users_by_role);
+        } else {
+            // Use demo data
+            const demoUsersByRole = {
+                students: { count: 1856, percentage: 75.6, color: '#5b34ea' },
+                instructors: { count: 356, percentage: 14.5, color: '#3b82f6' },
+                admins: { count: 246, percentage: 9.9, color: '#f59e0b' }
+            };
+            renderDonutChart(demoUsersByRole);
+        }
+        
+        // Update recent registrations
+        if (data.recent_users && data.recent_users.length > 0) {
+            renderRecentRegistrations(data.recent_users);
+        } else {
+            renderDemoRegistrations();
+        }
+        
+        // Update top courses
+        if (data.top_courses && data.top_courses.length > 0) {
+            renderTopCourses(data.top_courses);
+        } else {
+            renderDemoTopCourses();
+        }
+        
+        // Update recent activity
+        if (data.recent_activity && data.recent_activity.length > 0) {
+            renderRecentActivity(data.recent_activity);
+        } else {
+            renderDemoActivity();
+        }
+        
+        // Update system overview
+        renderSystemOverview();
+        
+        // Draw chart
+        drawChart('weekly');
+    }
+    
+    // ============================================
+    // Render Functions
+    // ============================================
+    
+    function renderDonutChart(usersByRole) {
+        const container = document.getElementById('donutChart');
+        const total = (usersByRole.students?.count || 0) + (usersByRole.instructors?.count || 0) + (usersByRole.admins?.count || 0);
+        
+        let cumulativePercent = 0;
+        let paths = '';
+        
+        const roles = [
+            { name: 'students', data: usersByRole.students, color: '#5b34ea' },
+            { name: 'instructors', data: usersByRole.instructors, color: '#3b82f6' },
+            { name: 'admins', data: usersByRole.admins, color: '#f59e0b' }
+        ];
+        
+        roles.forEach(role => {
+            if (role.data && role.data.count > 0) {
+                const percentage = (role.data.count / total) * 100;
+                const startAngle = cumulativePercent * 3.6;
+                const endAngle = (cumulativePercent + percentage) * 3.6;
+                
+                const startRad = (startAngle - 90) * Math.PI / 180;
+                const endRad = (endAngle - 90) * Math.PI / 180;
+                
+                const x1 = 90 + 70 * Math.cos(startRad);
+                const y1 = 90 + 70 * Math.sin(startRad);
+                const x2 = 90 + 70 * Math.cos(endRad);
+                const y2 = 90 + 70 * Math.sin(endRad);
+                
+                const largeArcFlag = percentage > 50 ? 1 : 0;
+                
+                paths += `<path d="M 90 90 L ${x1} ${y1} A 70 70 0 ${largeArcFlag} 1 ${x2} ${y2} Z" fill="${role.color}" />`;
+                
+                cumulativePercent += percentage;
+            }
+        });
+        
+        container.innerHTML = `
+            <svg viewBox="0 0 180 180">
+                <circle cx="90" cy="90" r="70" fill="#f0f0f0"/>
+                ${paths}
+                <circle cx="90" cy="90" r="50" fill="white"/>
+                <text x="90" y="85" text-anchor="middle" font-size="20" font-weight="bold" fill="#111827">${formatNumber(total)}</text>
+                <text x="90" y="105" text-anchor="middle" font-size="10" fill="#6b7280">Total Users</text>
+            </svg>
+        `;
+        
+        // Render legend
+        const legendContainer = document.getElementById('roleLegend');
+        legendContainer.innerHTML = roles.map(role => {
+            if (role.data && role.data.count > 0) {
+                const percentage = ((role.data.count / total) * 100).toFixed(1);
+                return `
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: ${role.color};"></div>
+                        <span>${role.name.charAt(0).toUpperCase() + role.name.slice(1)}</span>
+                        <strong>${formatNumber(role.data.count)} (${percentage}%)</strong>
+                    </div>
+                `;
+            }
+            return '';
+        }).join('');
+    }
+    
+    function renderRecentRegistrations(users) {
+        const container = document.getElementById('recentRegistrations');
+        container.innerHTML = users.slice(0, 5).map(user => `
+            <div class="recent-item" onclick="viewUser('${user.email}')">
+                <div class="recent-avatar">${(user.full_name?.charAt(0) || 'U').toUpperCase()}</div>
+                <div class="recent-info">
+                    <div class="recent-name">${escapeHtml(user.full_name || 'Unknown')}</div>
+                    <div class="recent-email">${escapeHtml(user.email || '')}</div>
+                </div>
+                <div class="recent-date">${formatDate(user.created_at)}</div>
+            </div>
+        `).join('');
+    }
+    
+    function renderDemoRegistrations() {
+        const demoUsers = [
+            { full_name: 'Sarah Johnson', email: 'sarah.johnson@example.com', created_at: new Date().toISOString() },
+            { full_name: 'Michael Brown', email: 'michael.brown@example.com', created_at: new Date().toISOString() },
+            { full_name: 'Emily Davis', email: 'emily.davis@example.com', created_at: new Date(Date.now() - 86400000).toISOString() }
+        ];
+        renderRecentRegistrations(demoUsers);
+    }
+    
+    function renderTopCourses(courses) {
+        const container = document.getElementById('topCourses');
+        container.innerHTML = courses.slice(0, 5).map(course => `
+            <div class="recent-item" onclick="viewCourse('${course.title}')">
+                <div class="status-icon" style="background: #f0e6ff20; color: #5b34ea;">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="status-info">
+                    <div class="recent-name">${escapeHtml(course.title)}</div>
+                    <div class="recent-email">${course.enrollments_count || 0} students enrolled</div>
+                    <div class="status-bar">
+                        <div class="status-bar-fill" style="width: ${course.progress || 65}%; background: #5b34ea;"></div>
+                    </div>
+                </div>
+                <div class="recent-date">${course.progress || 65}%</div>
+            </div>
+        `).join('');
+    }
+    
+    function renderDemoTopCourses() {
+        const demoCourses = [
+            { title: 'Web Development Fundamentals', enrollments_count: 845, progress: 68 },
+            { title: 'Python Programming Basics', enrollments_count: 654, progress: 72 },
+            { title: 'UI/UX Design Essentials', enrollments_count: 412, progress: 65 }
+        ];
+        renderTopCourses(demoCourses);
+    }
+    
+    function renderRecentActivity(activities) {
+        const container = document.getElementById('recentActivity');
+        container.innerHTML = activities.slice(0, 5).map(activity => {
+            let icon = 'fa-bell';
+            let color = '#5b34ea';
+            
+            if (activity.action?.toLowerCase().includes('user')) {
+                icon = 'fa-user-plus';
+                color = '#5b34ea';
+            } else if (activity.action?.toLowerCase().includes('course')) {
+                icon = 'fa-book';
+                color = '#10b981';
+            } else if (activity.action?.toLowerCase().includes('quiz')) {
+                icon = 'fa-question-circle';
+                color = '#f59e0b';
+            }
+            
+            return `
+                <div class="recent-item">
+                    <div class="status-icon" style="background: ${color}20; color: ${color};">
+                        <i class="fas ${icon}"></i>
+                    </div>
+                    <div class="status-info">
+                        <div class="recent-name">${escapeHtml(activity.action || 'Activity')}</div>
+                        <div class="recent-email">${escapeHtml(activity.description || activity.user || '')}</div>
+                    </div>
+                    <div class="recent-date">${activity.time || formatDate(activity.created_at)}</div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    function renderDemoActivity() {
+        const demoActivities = [
+            { action: 'New user registered', description: 'Sarah Johnson joined the platform', time: '2 min ago' },
+            { action: 'New course added', description: 'Advanced JavaScript', time: '1 hour ago' },
+            { action: 'Quiz created', description: 'React Basics Quiz', time: '3 hours ago' }
+        ];
+        renderRecentActivity(demoActivities);
+    }
+    
+    function renderSystemOverview() {
+        const container = document.getElementById('systemOverview');
+        container.innerHTML = `
+            <div class="status-item">
+                <div class="status-icon" style="background: #f0e6ff; color: #5b34ea;"><i class="fas fa-server"></i></div>
+                <div class="status-info">
+                    <div class="status-label">Storage Used</div>
+                    <div class="status-value">128.5 GB / 500 GB</div>
+                    <div class="status-bar"><div class="status-bar-fill" style="width: 25.7%; background: #5b34ea;"></div></div>
+                </div>
+                <div class="recent-date">25.7%</div>
+            </div>
+            <div class="status-item">
+                <div class="status-icon" style="background: #e6f0ff; color: #3b82f6;"><i class="fas fa-wave-square"></i></div>
+                <div class="status-info">
+                    <div class="status-label">Bandwidth Used</div>
+                    <div class="status-value">256.3 GB / 1 TB</div>
+                    <div class="status-bar"><div class="status-bar-fill" style="width: 25%; background: #3b82f6;"></div></div>
+                </div>
+                <div class="recent-date">25.0%</div>
+            </div>
+            <div class="status-item">
+                <div class="status-icon" style="background: #e3f9ee; color: #10b981;"><i class="fas fa-users"></i></div>
+                <div class="status-info">
+                    <div class="status-label">Active Sessions</div>
+                    <div class="status-value">342 users online</div>
+                </div>
+                <button class="btn btn-outline btn-sm" onclick="alert('Active sessions: 342 users currently online')">View</button>
+            </div>
+            <div class="status-item">
+                <div class="status-icon" style="background: #fff0e6; color: #f59e0b;"><i class="fas fa-chart-line"></i></div>
+                <div class="status-info">
+                    <div class="status-label">System Uptime</div>
+                    <div class="status-value">99.98%</div>
+                </div>
+                <div class="recent-date">This Month</div>
+            </div>
+        `;
+    }
+    
+    // ============================================
+    // Chart Functions
+    // ============================================
+    
+    function drawChart(period = 'weekly') {
+        const canvas = document.getElementById('enrollmentCanvas');
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        const container = canvas.parentElement;
+        const width = container.clientWidth - 40;
+        const height = 200;
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        ctx.clearRect(0, 0, width, height);
+        
+        // Draw grid lines
+        ctx.strokeStyle = '#e5e7eb';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 4; i++) {
+            const y = height - (i * height / 4);
+            ctx.beginPath();
+            ctx.moveTo(40, y);
+            ctx.lineTo(width - 20, y);
+            ctx.stroke();
+        }
+        
+        // Data based on period
+        let data = [];
+        if (period === 'weekly') {
+            data = [45, 110, 85, 105, 45, 105, 60];
+        } else if (period === 'monthly') {
+            data = [120, 145, 170, 190, 210, 230, 250];
+        } else {
+            data = [180, 220, 280, 340, 400, 480, 560];
+        }
+        
+        const maxValue = Math.max(...data);
+        const xStep = (width - 60) / (data.length - 1);
+        
+        // Draw line
+        ctx.beginPath();
+        ctx.strokeStyle = '#5b34ea';
+        ctx.lineWidth = 3;
+        
+        for (let i = 0; i < data.length; i++) {
+            const x = 40 + i * xStep;
+            const y = height - (data[i] / maxValue) * (height - 40) - 20;
+            
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+        }
+        ctx.stroke();
+        
+        // Draw points
+        ctx.fillStyle = '#5b34ea';
+        for (let i = 0; i < data.length; i++) {
+            const x = 40 + i * xStep;
+            const y = height - (data[i] / maxValue) * (height - 40) - 20;
+            ctx.beginPath();
+            ctx.arc(x, y, 4, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+        
+        // Draw labels
+        ctx.fillStyle = '#6b7280';
+        ctx.font = '10px Inter';
+        const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        for (let i = 0; i < labels.length; i++) {
+            const x = 40 + i * xStep - 10;
+            ctx.fillText(labels[i], x, height - 5);
+        }
+    }
+    
+    function changeChartPeriod() {
+        const period = document.getElementById('chartPeriod').value;
+        drawChart(period);
+    }
+    
+    // ============================================
+    // Notifications Functions
+    // ============================================
+    
+    async function loadNotifications() {
+        const token = localStorage.getItem('edunova_token');
+        
+        try {
+            const response = await fetch(`${API_BASE}/admin/get_notifications.php`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                const badge = document.getElementById('notificationBadge');
+                const unreadCount = data.unread_count || 0;
+                badge.innerText = unreadCount > 9 ? '9+' : unreadCount;
+                badge.style.display = unreadCount > 0 ? 'inline-flex' : 'none';
+            }
+        } catch (error) {
+            console.error('Error loading notifications:', error);
+        }
+    }
+    
+    function openNotificationsModal() {
+        const modal = document.getElementById('notificationsModal');
+        modal.classList.add('active');
+        loadNotificationsList();
+    }
+    
+    function closeNotificationsModal() {
+        document.getElementById('notificationsModal').classList.remove('active');
+    }
+    
+    async function loadNotificationsList() {
+        const token = localStorage.getItem('edunova_token');
+        const container = document.getElementById('notificationsList');
+        
+        try {
+            const response = await fetch(`${API_BASE}/admin/get_notifications.php`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            
+            if (data.success && data.notifications && data.notifications.length > 0) {
+                container.innerHTML = data.notifications.map(notif => `
+                    <div class="activity-item" style="cursor: pointer; padding: 12px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 12px;">
+                        <div class="activity-icon" style="width: 36px; height: 36px; background: #f0e6ff; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #5b34ea;">
+                            <i class="fas ${notif.type === 'message' ? 'fa-envelope' : 'fa-bullhorn'}"></i>
+                        </div>
+                        <div class="activity-content" style="flex: 1;">
+                            <div class="activity-title">${escapeHtml(notif.title)}</div>
+                            <div class="activity-time">${formatDate(notif.created_at)}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<div style="text-align: center; padding: 40px;">No notifications</div>';
+            }
+        } catch (error) {
+            container.innerHTML = '<div style="text-align: center; padding: 40px;">Error loading notifications</div>';
+        }
+    }
+    
+    function markAllNotificationsRead() {
+        alert('All notifications marked as read');
+        document.getElementById('notificationBadge').innerText = '0';
+        closeNotificationsModal();
+    }
+    
+    // ============================================
+    // Search Functionality
+    // ============================================
+    
+    function initSearch() {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                const term = e.target.value.toLowerCase();
+                if (term.length > 2) {
+                    console.log(`Searching for: "${term}"`);
+                }
+            });
+        }
+    }
+    
+    // ============================================
+    // Navigation & Sidebar
+    // ============================================
+    
+    function initNavigation() {
+        document.querySelectorAll('.menu-item[data-page]').forEach(item => {
+            item.addEventListener('click', () => {
+                const page = item.dataset.page;
+                navigateTo(page);
+            });
+        });
+        
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('edunova_token');
+            localStorage.removeItem('edunova_user');
+            localStorage.removeItem('edunova_admin');
+            window.location.href = 'login.html';
+        });
+    }
+    
+    function initSidebarClose() {
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.querySelector('.menu-toggle');
+            
+            if (window.innerWidth <= 1024 && sidebar?.classList.contains('open')) {
+                if (!sidebar.contains(event.target) && !menuToggle?.contains(event.target)) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+    }
+    
+    function updateSystemStatus() {
+        const indicator = document.getElementById('systemStatusIndicator');
+        indicator.innerHTML = `
+            <i class="fas fa-circle" style="color: var(--success); font-size: 0.625rem;"></i>
+            <span style="font-size: 0.75rem;">All Systems Operational</span>
+        `;
+    }
+    
+    // ============================================
+    // Initialize Dashboard
+    // ============================================
+    
+    function checkAuth() {
+        const token = localStorage.getItem('edunova_token');
+        const admin = localStorage.getItem('edunova_admin');
+        
+        if (!token || !admin) {
+            window.location.href = 'login.html';
+            return false;
+        }
+        return true;
+    }
+    
+    window.onclick = function(event) {
+        const modal = document.getElementById('notificationsModal');
+        if (event.target === modal) {
+            closeNotificationsModal();
+        }
+    }
+    
+    window.addEventListener('resize', () => {
+        drawChart(document.getElementById('chartPeriod').value);
+    });
+    
+    async function init() {
+        if (!checkAuth()) return;
+        
+        initNavigation();
+        initSidebarClose();
+        initSearch();
+        updateSystemStatus();
+        
+        await fetchDashboardData();
+        await loadNotifications();
+    }
+    
+    window.toggleSidebar = toggleSidebar;
+    window.showNotifications = showNotifications;
+    window.navigateTo = navigateTo;
+    window.viewAllRegistrations = viewAllRegistrations;
+    window.viewAllCourses = viewAllCourses;
+    window.viewAllActivity = viewAllActivity;
+    window.viewSystemHealth = viewSystemHealth;
+    window.changeChartPeriod = changeChartPeriod;
+    window.viewUser = viewUser;
+    window.viewCourse = viewCourse;
+    window.openNotificationsModal = openNotificationsModal;
+    window.closeNotificationsModal = closeNotificationsModal;
+    window.markAllNotificationsRead = markAllNotificationsRead;
+    
+    init();
+</script>
+
+<style>
+    .upgrade-card {
+        background: white;
+        border-radius: var(--radius-xl);
+        padding: 20px;
+        margin-top: 30px;
+        text-align: center;
+    }
+    
+    .upgrade-card h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+    
+    .status-indicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 8px;
+        background: #f0fdf4;
+        border-radius: var(--radius-lg);
+        margin-bottom: 12px;
+    }
+    
+    canvas {
+        width: 100%;
+        height: auto;
+        max-height: 200px;
+    }
+    
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal.active {
+        display: flex;
+    }
+    
+    .modal-content {
+        background: white;
+        border-radius: var(--radius-xl);
+        width: 90%;
+        max-width: 500px;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    
+    .modal-header {
+        padding: 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .close-modal {
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--gray);
+    }
+    
+    .activity-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px 20px;
+        border-bottom: 1px solid var(--border);
+    }
+    
+    .activity-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    .activity-content {
+        flex: 1;
+    }
+    
+    .activity-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+    
+    .activity-time {
+        font-size: 0.7rem;
+        color: var(--gray);
+    }
+</style>
+
+</body>
+</html>

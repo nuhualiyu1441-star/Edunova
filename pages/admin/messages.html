@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Messages - Edunova Admin</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .page-header {
+            margin-bottom: 25px;
+        }
+        
+        .page-header h1 {
+            font-size: 1.75rem;
+            margin-bottom: 8px;
+        }
+        
+        .messaging-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 25px;
+            background: white;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            min-height: 600px;
+        }
+        
+        /* Conversations Sidebar */
+        .conversations-sidebar {
+            background: #fafbfc;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .conversations-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .conversations-header h3 {
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+        
+        .conversations-search {
+            position: relative;
+        }
+        
+        .conversations-search input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            font-size: 0.875rem;
+        }
+        
+        .conversations-search i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+        
+        .conversations-list {
+            flex: 1;
+            overflow-y: auto;
+            max-height: calc(100vh - 200px);
+        }
+        
+        .conversation-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .conversation-item:hover {
+            background: #f0f0f0;
+        }
+        
+        .conversation-item.active {
+            background: #f0ebff;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .conversation-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+        
+        .conversation-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .conversation-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .conversation-last-message {
+            font-size: 0.75rem;
+            color: var(--gray);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .conversation-time {
+            font-size: 0.65rem;
+            color: var(--gray);
+        }
+        
+        .unread-badge {
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.65rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Chat Area */
+        .chat-area {
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+        
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .chat-header-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .chat-header-info h4 {
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+        
+        .chat-header-info p {
+            font-size: 0.7rem;
+            color: var(--gray);
+        }
+        
+        .chat-header-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            max-height: calc(100vh - 300px);
+            background: #fafbfc;
+        }
+        
+        .message {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .message.outgoing {
+            justify-content: flex-end;
+        }
+        
+        .message-bubble {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            position: relative;
+        }
+        
+        .message.incoming .message-bubble {
+            background: white;
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 4px;
+        }
+        
+        .message.outgoing .message-bubble {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .message-text {
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+        
+        .message-time {
+            font-size: 0.65rem;
+            margin-top: 5px;
+            opacity: 0.7;
+        }
+        
+        .message-status {
+            font-size: 0.6rem;
+            margin-left: 5px;
+        }
+        
+        .chat-input-area {
+            padding: 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+        }
+        
+        .chat-input {
+            flex: 1;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 12px 15px;
+            font-size: 0.875rem;
+            resize: none;
+            font-family: inherit;
+        }
+        
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .chat-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-action-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0f0f0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .chat-action-btn:hover {
+            background: var(--border);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--border);
+            margin-bottom: 20px;
+        }
+        
+        /* Compose Modal */
+        .compose-modal .modal-content {
+            max-width: 500px;
+        }
+        
+        .recipient-select {
+            margin-bottom: 20px;
+        }
+        
+        .recipient-options {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            margin-top: 10px;
+        }
+        
+        .recipient-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .recipient-option:hover {
+            background: #f0f0f0;
+        }
+        
+        .recipient-option.selected {
+            background: #f0ebff;
+        }
+        
+        .recipient-option input {
+            margin-right: 10px;
+        }
+        
+        .loading-spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .messaging-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .conversations-sidebar {
+                display: none;
+            }
+            
+            .conversations-sidebar.mobile-open {
+                display: flex;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 1000;
+                background: white;
+            }
+        }
+        
+        .typing-indicator {
+            padding: 10px 15px;
+            font-size: 0.75rem;
+            color: var(--gray);
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div>
+            <div class="sidebar-header">
+                <i class="fas fa-graduation-cap"></i>
+                <h2>Edunova<br><span>Admin Panel</span></h2>
+            </div>
+            <nav class="sidebar-menu">
+                <div class="menu-item" data-page="dashboard">
+                    <i class="fas fa-house"></i> Dashboard
+                </div>
+                <div class="menu-item" data-page="students">
+                    <i class="fas fa-users"></i> Manage Students
+                </div>
+                <div class="menu-item" data-page="courses">
+                    <i class="fas fa-book-open"></i> Manage Courses
+                </div>
+                <div class="menu-item" data-page="lessons">
+                    <i class="fas fa-video"></i> Upload Lessons
+                </div>
+                <div class="menu-item" data-page="quizzes">
+                    <i class="fas fa-question-circle"></i> Manage Quizzes
+                </div>
+                <div class="menu-item active" data-page="messages">
+                    <i class="fas fa-envelope"></i> Messages
+                </div>
+                <div class="menu-item" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </div>
+            </nav>
+        </div>
+        <div class="upgrade-card">
+            <h3><i class="fas fa-chart-line"></i> Message Stats</h3>
+            <div style="margin-top: 15px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span>Total Conversations</span>
+                    <strong id="totalConversations">0</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span>Unread Messages</span>
+                    <strong id="unreadCount" style="color: var(--primary);">0</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Total Messages</span>
+                    <strong id="totalMessages">0</strong>
+                </div>
+            </div>
+            <hr style="margin: 15px 0; border-color: var(--border);">
+            <button class="btn btn-primary" onclick="openComposeModal()" style="width: 100%;">
+                <i class="fas fa-plus"></i> New Message
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="menu-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <h2 style="font-size: 1.25rem;">Messages</h2>
+            </div>
+            <div class="topbar-right">
+                <div class="notification" onclick="showNotifications()">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">5</span>
+                </div>
+                <div class="profile">
+                    <img src="../../uploads/profiles/admin.jpg" alt="Profile" class="profile-img">
+                    <div class="profile-info">
+                        <h4 id="adminName">Admin User</h4>
+                        <p>Super Admin</p>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <div class="page-header">
+                <h1>Messages</h1>
+                <p>Communicate with students and instructors</p>
+            </div>
+
+            <!-- Messaging Container -->
+            <div class="messaging-container">
+                <!-- Conversations Sidebar -->
+                <div class="conversations-sidebar" id="conversationsSidebar">
+                    <div class="conversations-header">
+                        <h3>Conversations</h3>
+                        <div class="conversations-search">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="conversationSearch" placeholder="Search conversations...">
+                        </div>
+                    </div>
+                    <div class="conversations-list" id="conversationsList">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+
+                <!-- Chat Area -->
+                <div class="chat-area" id="chatArea">
+                    <div class="empty-state">
+                        <i class="fas fa-comments"></i>
+                        <h3>No conversation selected</h3>
+                        <p>Select a conversation from the left or start a new one</p>
+                        <button class="btn btn-primary" onclick="openComposeModal()" style="margin-top: 20px;">
+                            <i class="fas fa-plus"></i> New Message
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Compose Message Modal -->
+<div class="modal" id="composeModal">
+    <div class="modal-content compose-modal">
+        <div class="modal-header">
+            <h3><i class="fas fa-envelope"></i> New Message</h3>
+            <span class="close-modal" onclick="closeComposeModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="form-label">To:</label>
+                <div class="recipient-select">
+                    <select class="form-input" id="recipientType" onchange="loadRecipients()">
+                        <option value="student">Students</option>
+                        <option value="instructor">Instructors</option>
+                    </select>
+                    <div class="recipient-options" id="recipientOptions">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Subject</label>
+                <input type="text" class="form-input" id="messageSubject" placeholder="Enter subject">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Message</label>
+                <textarea class="form-textarea" id="messageContent" rows="5" placeholder="Write your message..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeComposeModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i> Send Message
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============================================
+    // MESSAGING SYSTEM - FULL API INTEGRATION
+    // ============================================
+    
+    const API_BASE = 'http://localhost/edunova/api';
+    let conversations = [];
+    let currentConversation = null;
+    let messages = [];
+    let recipients = [];
+    let selectedRecipient = null;
+    let pollingInterval = null;
+    
+    // ============================================
+    // Helper Functions
+    // ============================================
+    
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('open');
+    }
+    
+    function showNotifications() {
+        alert('🔔 Notifications\n\n• 3 new messages\n• 2 unread conversations');
+    }
+    
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    function formatTime(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        const now = new Date();
+        const diff = now - date;
+        
+        if (diff < 86400000) {
+            return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        } else if (diff < 604800000) {
+            return date.toLocaleDateString('en-US', { weekday: 'short' });
+        } else {
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+    }
+    
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: ${type === 'success' ? '#22c55e' : type === 'error' ? '#ef4444' : '#333'};
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            z-index: 3000;
+            animation: slideIn 0.3s ease;
+        `;
+        toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
+    // ============================================
+    // API Calls - Conversations
+    // ============================================
+    
+    async function fetchConversations() {
+        const token = localStorage.getItem('edunova_token');
+        
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        try {
+            const response = await fetch(`${API_BASE}/admin/get_conversations.php`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                conversations = data.conversations || [];
+                renderConversations();
+                updateStats();
+            } else if (response.status === 401) {
+                window.location.href = 'login.html';
+            }
+        } catch (error) {
+            console.error('Error fetching conversations:', error);
+            document.getElementById('conversationsList').innerHTML = '<div class="empty-state" style="padding: 20px;">Failed to load conversations</div>';
+        }
+    }
+    
+    async function fetchMessages(conversationId) {
+        const token = localStorage.getItem('edunova_token');
+        
+        try {
+            const response = await fetch(`${API_BASE}/admin/get_messages.php?conversation_id=${conversationId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                messages = data.messages || [];
+                renderMessages();
+                markMessagesAsRead(conversationId);
+            }
+        } catch (error) {
+            console.error('Error fetching messages:', error);
+        }
+    }
+    
+    async function sendMessageToAPI(recipientId, subject, content) {
+        const token = localStorage.getItem('edunova_token');
+        
+        try {
+            const response = await fetch(`${API_BASE}/admin/send_message.php`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    recipient_id: recipientId,
+                    subject: subject,
+                    message: content
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                showToast('Message sent successfully');
+                closeComposeModal();
+                fetchConversations();
+                
+                if (currentConversation) {
+                    fetchMessages(currentConversation.id);
+                }
+            } else {
+                showToast(data.error || 'Failed to send message', 'error');
+            }
+        } catch (error) {
+            showToast('Network error. Please try again.', 'error');
+        }
+    }
+    
+    async function markMessagesAsRead(conversationId) {
+        const token = localStorage.getItem('edunova_token');
+        
+        try {
+            await fetch(`${API_BASE}/admin/mark_messages_read.php?conversation_id=${conversationId}`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            fetchConversations();
+        } catch (error) {
+            console.error('Error marking messages as read:', error);
+        }
+    }
+    
+    // ============================================
+    // Render Functions
+    // ============================================
+    
+    function renderConversations() {
+        const container = document.getElementById('conversationsList');
+        const searchTerm = document.getElementById('conversationSearch')?.value.toLowerCase() || '';
+        
+        let filtered = conversations;
+        if (searchTerm) {
+            filtered = conversations.filter(conv => 
+                conv.other_party_name.toLowerCase().includes(searchTerm) ||
+                conv.last_message?.toLowerCase().includes(searchTerm)
+            );
+        }
+        
+        if (filtered.length === 0) {
+            container.innerHTML = '<div class="empty-state" style="padding: 20px;">No conversations found</div>';
+            return;
+        }
+        
+        container.innerHTML = filtered.map(conv => {
+            const initial = conv.other_party_name.charAt(0).toUpperCase();
+            const isActive = currentConversation && currentConversation.id === conv.id;
+            const unreadClass = conv.unread_count > 0 ? 'unread-badge' : '';
+            
+            return `
+                <div class="conversation-item ${isActive ? 'active' : ''}" onclick="selectConversation(${conv.id})">
+                    <div class="conversation-avatar">${initial}</div>
+                    <div class="conversation-info">
+                        <div class="conversation-name">
+                            <span>${escapeHtml(conv.other_party_name)}</span>
+                            <span class="conversation-time">${formatTime(conv.last_message_time)}</span>
+                        </div>
+                        <div class="conversation-last-message">${escapeHtml(conv.last_message || 'No messages yet')}</div>
+                    </div>
+                    ${conv.unread_count > 0 ? `<div class="${unreadClass}">${conv.unread_count}</div>` : ''}
+                </div>
+            `;
+        }).join('');
+    }
+    
+    function renderMessages() {
+        const chatArea = document.getElementById('chatArea');
+        const adminName = localStorage.getItem('edunova_admin') ? 
+            JSON.parse(localStorage.getItem('edunova_admin')).name : 'Admin';
+        
+        if (!currentConversation) {
+            chatArea.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-comments"></i>
+                    <h3>No conversation selected</h3>
+                    <p>Select a conversation from the left or start a new one</p>
+                    <button class="btn btn-primary" onclick="openComposeModal()" style="margin-top: 20px;">
+                        <i class="fas fa-plus"></i> New Message
+                    </button>
+                </div>
+            `;
+            return;
+        }
+        
+        if (messages.length === 0) {
+            chatArea.innerHTML = `
+                <div class="chat-header">
+                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(currentConversation.other_party_name)}&background=5B34F2&color=fff" class="chat-header-avatar">
+                    <div class="chat-header-info">
+                        <h4>${escapeHtml(currentConversation.other_party_name)}</h4>
+                        <p>${escapeHtml(currentConversation.other_party_role || 'User')}</p>
+                    </div>
+                    <div class="chat-header-actions">
+                        <div class="chat-action-btn" onclick="openComposeWithUser(${currentConversation.other_party_id})" title="New Message">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="empty-state" style="padding: 40px;">
+                        <i class="fas fa-comment-dots"></i>
+                        <p>No messages yet. Send a message to start the conversation.</p>
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <textarea class="chat-input" id="messageInput" placeholder="Type your message..." rows="2"></textarea>
+                    <div class="chat-actions">
+                        <div class="chat-action-btn" onclick="sendReply()">
+                            <i class="fas fa-paper-plane" style="color: var(--primary);"></i>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+        
+        chatArea.innerHTML = `
+            <div class="chat-header">
+                <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(currentConversation.other_party_name)}&background=5B34F2&color=fff" class="chat-header-avatar">
+                <div class="chat-header-info">
+                    <h4>${escapeHtml(currentConversation.other_party_name)}</h4>
+                    <p>${escapeHtml(currentConversation.other_party_role || 'User')}</p>
+                </div>
+                <div class="chat-header-actions">
+                    <div class="chat-action-btn" onclick="openComposeWithUser(${currentConversation.other_party_id})" title="New Message">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                ${messages.map(msg => `
+                    <div class="message ${msg.sender_name === adminName ? 'outgoing' : 'incoming'}">
+                        <div class="message-bubble">
+                            <div class="message-text">${escapeHtml(msg.message)}</div>
+                            <div class="message-time">
+                                ${formatTime(msg.created_at)}
+                                ${msg.sender_name === adminName ? '<span class="message-status"><i class="fas fa-check-double"></i></span>' : ''}
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="chat-input-area">
+                <textarea class="chat-input" id="messageInput" placeholder="Type your message..." rows="2"></textarea>
+                <div class="chat-actions">
+                    <div class="chat-action-btn" onclick="sendReply()">
+                        <i class="fas fa-paper-plane" style="color: var(--primary);"></i>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Scroll to bottom
+        const messagesContainer = document.getElementById('chatMessages');
+        if (messagesContainer) {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+    }
+    
+    function updateStats() {
+        const total = conversations.length;
+        const unread = conversations.reduce((sum, conv) => sum + (conv.unread_count || 0), 0);
+        const totalMsgs = conversations.reduce((sum, conv) => sum + (conv.total_messages || 0), 0);
+        
+        document.getElementById('totalConversations').innerText = total;
+        document.getElementById('unreadCount').innerText = unread;
+        document.getElementById('totalMessages').innerText = totalMsgs;
+    }
+    
+    // ============================================
+    // User Actions
+    // ============================================
+    
+    async function selectConversation(conversationId) {
+        const conversation = conversations.find(c => c.id === conversationId);
+        if (conversation) {
+            currentConversation = conversation;
+            await fetchMessages(conversationId);
+            renderConversations();
+        }
+    }
+    
+    async function sendReply() {
+        const messageInput = document.getElementById('messageInput');
+        const content = messageInput.value.trim();
+        
+        if (!content) {
+            showToast('Please enter a message', 'error');
+            return;
+        }
+        
+        if (!currentConversation) {
+            showToast('No conversation selected', 'error');
+            return;
+        }
+        
+        await sendMessageToAPI(currentConversation.other_party_id, 'Re: ' + currentConversation.subject, content);
+        messageInput.value = '';
+        await fetchMessages(currentConversation.id);
+    }
+    
+    // ============================================
+    // Compose Message Functions
+    // ============================================
+    
+    async function loadRecipients() {
+        const type = document.getElementById('recipientType').value;
+        const token = localStorage.getItem('edunova_token');
+        
+        try {
+            const response = await fetch(`${API_BASE}/admin/get_users.php?role=${type}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                recipients = data.users || [];
+                renderRecipients();
+            }
+        } catch (error) {
+            console.error('Error loading recipients:', error);
+        }
+    }
+    
+    function renderRecipients() {
+        const container = document.getElementById('recipientOptions');
+        
+        if (recipients.length === 0) {
+            container.innerHTML = '<div style="padding: 20px; text-align: center;">No users found</div>';
+            return;
+        }
+        
+        container.innerHTML = recipients.map(user => `
+            <div class="recipient-option" onclick="selectRecipient(${user.id})">
+                <input type="radio" name="recipient" value="${user.id}" id="recipient_${user.id}">
+                <div>
+                    <strong>${escapeHtml(user.full_name)}</strong><br>
+                    <small style="color: var(--gray);">${escapeHtml(user.email)}</small>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function selectRecipient(userId) {
+        selectedRecipient = userId;
+        document.querySelectorAll('.recipient-option').forEach(opt => {
+            opt.classList.remove('selected');
+        });
+        event.currentTarget.classList.add('selected');
+        const radio = event.currentTarget.querySelector('input');
+        if (radio) radio.checked = true;
+    }
+    
+    function openComposeModal() {
+        selectedRecipient = null;
+        document.getElementById('messageSubject').value = '';
+        document.getElementById('messageContent').value = '';
+        document.getElementById('composeModal').classList.add('active');
+        loadRecipients();
+    }
+    
+    function openComposeWithUser(userId) {
+        openComposeModal();
+        setTimeout(() => {
+            const radio = document.getElementById(`recipient_${userId}`);
+            if (radio) {
+                radio.checked = true;
+                selectedRecipient = userId;
+                document.querySelectorAll('.recipient-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                radio.closest('.recipient-option').classList.add('selected');
+            }
+        }, 500);
+    }
+    
+    function closeComposeModal() {
+        document.getElementById('composeModal').classList.remove('active');
+    }
+    
+    async function sendMessage() {
+        const subject = document.getElementById('messageSubject').value;
+        const content = document.getElementById('messageContent').value;
+        
+        if (!selectedRecipient) {
+            showToast('Please select a recipient', 'error');
+            return;
+        }
+        
+        if (!subject) {
+            showToast('Please enter a subject', 'error');
+            return;
+        }
+        
+        if (!content) {
+            showToast('Please enter a message', 'error');
+            return;
+        }
+        
+        await sendMessageToAPI(selectedRecipient, subject, content);
+    }
+    
+    // ============================================
+    // Navigation & Initialization
+    // ============================================
+    
+    function getAdminName() {
+        const admin = localStorage.getItem('edunova_admin');
+        if (admin) {
+            try {
+                const adminData = JSON.parse(admin);
+                document.getElementById('adminName').innerText = adminData.name || 'Admin User';
+            } catch(e) {}
+        }
+    }
+    
+    function initNavigation() {
+        document.querySelectorAll('.menu-item[data-page]').forEach(item => {
+            item.addEventListener('click', () => {
+                const page = item.dataset.page;
+                if (page === 'dashboard') window.location.href = 'dashboard.html';
+                else if (page === 'students') window.location.href = 'manage_students.html';
+                else if (page === 'courses') window.location.href = 'manage_courses.html';
+                else if (page === 'lessons') window.location.href = 'upload_lessons.html';
+                else if (page === 'quizzes') window.location.href = 'manage_quizzes.html';
+                else if (page === 'messages') return;
+            });
+        });
+        
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('edunova_token');
+            localStorage.removeItem('edunova_user');
+            localStorage.removeItem('edunova_admin');
+            window.location.href = 'login.html';
+        });
+    }
+    
+    // Search conversations
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.getElementById('conversationSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', renderConversations);
+        }
+    });
+    
+    // Enter key to send message
+    document.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            const messageInput = document.getElementById('messageInput');
+            if (messageInput && document.activeElement === messageInput) {
+                e.preventDefault();
+                sendReply();
+            }
+        }
+    });
+    
+    function checkAuth() {
+        const token = localStorage.getItem('edunova_token');
+        const admin = localStorage.getItem('edunova_admin');
+        if (!token || !admin) {
+            window.location.href = 'login.html';
+            return false;
+        }
+        return true;
+    }
+    
+    // Start polling for new messages
+    function startPolling() {
+        if (pollingInterval) clearInterval(pollingInterval);
+        pollingInterval = setInterval(() => {
+            if (currentConversation) {
+                fetchMessages(currentConversation.id);
+            }
+            fetchConversations();
+        }, 5000);
+    }
+    
+    async function init() {
+        if (!checkAuth()) return;
+        
+        getAdminName();
+        initNavigation();
+        
+        await fetchConversations();
+        startPolling();
+    }
+    
+    // Make functions global
+    window.toggleSidebar = toggleSidebar;
+    window.showNotifications = showNotifications;
+    window.selectConversation = selectConversation;
+    window.sendReply = sendReply;
+    window.openComposeModal = openComposeModal;
+    window.openComposeWithUser = openComposeWithUser;
+    window.closeComposeModal = closeComposeModal;
+    window.sendMessage = sendMessage;
+    window.loadRecipients = loadRecipients;
+    window.selectRecipient = selectRecipient;
+    
+    init();
+</script>
+
+<style>
+    .upgrade-card {
+        background: white;
+        border-radius: var(--radius-xl);
+        padding: 20px;
+        margin-top: 30px;
+    }
+    
+    .upgrade-card h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+    
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 2000;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal.active {
+        display: flex;
+    }
+    
+    .modal-content {
+        background: white;
+        border-radius: var(--radius-xl);
+        width: 90%;
+        max-width: 550px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    .modal-header {
+        padding: 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+    
+    .modal-footer {
+        padding: 20px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+    
+    .close-modal {
+        cursor: pointer;
+        font-size: 1.25rem;
+    }
+    
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+</style>
+
+</body>
+</html>

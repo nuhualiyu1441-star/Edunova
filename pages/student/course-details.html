@@ -1,0 +1,1839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Course Details - Edunova Smart Learning</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- PDF.js for PDF viewing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <style>
+        /* Course Details Specific Styles */
+        .video-player-section {
+            background: white;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            margin-bottom: 25px;
+            display: none;
+        }
+        
+        .video-player-section.active {
+            display: block;
+        }
+        
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            background: #000;
+        }
+        
+        .video-container iframe,
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .video-info {
+            padding: 20px;
+        }
+        
+        .current-lesson-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .current-lesson-description {
+            color: var(--gray);
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+        
+        .lesson-nav {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .course-hero {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 25px;
+            margin-bottom: 25px;
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .course-hero-image {
+            width: 300px;
+            height: 200px;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        .course-hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .course-hero-info {
+            flex: 1;
+        }
+        
+        .course-hero-info h1 {
+            font-size: 1.75rem;
+            margin-bottom: 10px;
+        }
+        
+        .course-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+            font-size: 0.875rem;
+            color: var(--gray);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 30px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            padding: 12px 0;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--gray);
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .tab-btn.active {
+            color: var(--primary);
+        }
+        
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+        }
+        
+        .module-item {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        
+        .module-header {
+            padding: 15px 20px;
+            background: #f8f7fc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .module-header h3 {
+            font-size: 1rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .module-progress {
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+        
+        .lesson-list {
+            display: none;
+        }
+        
+        .lesson-list.open {
+            display: block;
+        }
+        
+        .lesson-item {
+            padding: 12px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .lesson-item:hover {
+            background: #f8f7fc;
+        }
+        
+        .lesson-item.active {
+            background: #f0ebff;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .lesson-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .lesson-type-badge {
+            font-size: 0.625rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 8px;
+        }
+        
+        .badge-youtube {
+            background: #ff0000;
+            color: white;
+        }
+        
+        .badge-video {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .badge-pdf {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .badge-document {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .badge-text {
+            background: #10b981;
+            color: white;
+        }
+        
+        .lesson-completed {
+            color: var(--success);
+        }
+        
+        .module-icon {
+            transition: transform 0.3s;
+        }
+        
+        /* PDF Viewer Styles */
+        .pdf-viewer {
+            background: #f5f5f5;
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            min-height: 600px;
+        }
+        
+        .pdf-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: white;
+            border-radius: var(--radius-lg);
+            flex-wrap: wrap;
+        }
+        
+        .pdf-controls button {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .pdf-controls button:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .pdf-controls span {
+            font-size: 0.875rem;
+        }
+        
+        .pdf-canvas-container {
+            text-align: center;
+            overflow-x: auto;
+        }
+        
+        canvas {
+            box-shadow: var(--shadow-md);
+            margin: 0 auto;
+            max-width: 100%;
+            height: auto;
+        }
+        
+        /* Document Viewer */
+        .document-viewer {
+            padding: 40px;
+            text-align: center;
+            background: #f8f7fc;
+            border-radius: var(--radius-lg);
+        }
+        
+        .document-viewer i {
+            font-size: 4rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .document-viewer h3 {
+            margin-bottom: 10px;
+        }
+        
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: var(--primary);
+            color: white;
+            border-radius: var(--radius-lg);
+            text-decoration: none;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        
+        .download-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        /* Resources Section */
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .resource-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .resource-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .resource-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .resource-icon.pdf { background: #fee2e2; color: #ef4444; }
+        .resource-icon.video { background: #dbeafe; color: #3b82f6; }
+        .resource-icon.document { background: #fef3c7; color: #f59e0b; }
+        .resource-icon.link { background: #dcfce7; color: #10b981; }
+        
+        .resource-info h4 {
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+        
+        .resource-info p {
+            font-size: 0.7rem;
+            color: var(--gray);
+        }
+        
+        /* Notice Box Styles */
+        .notice-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: var(--radius-lg);
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .notice-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+        
+        .notice-icon {
+            width: 32px;
+            height: 32px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f59e0b;
+            font-size: 1rem;
+        }
+        
+        .notice-text {
+            flex: 1;
+        }
+        
+        .notice-title {
+            font-weight: 700;
+            font-size: 0.875rem;
+            margin-bottom: 2px;
+        }
+        
+        .notice-message {
+            font-size: 0.75rem;
+            color: #92400e;
+        }
+        
+        .notice-close {
+            cursor: pointer;
+            color: #92400e;
+            padding: 5px;
+        }
+        
+        /* Announcement Banner */
+        .announcement-banner {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            border-radius: var(--radius-lg);
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .announcement-banner:hover {
+            transform: translateX(5px);
+        }
+        
+        .announcement-icon {
+            width: 35px;
+            height: 35px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .announcement-text {
+            flex: 1;
+        }
+        
+        .announcement-title {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .announcement-date {
+            font-size: 0.65rem;
+            color: #4338ca;
+        }
+        
+        /* Message Badge */
+        .message-badge {
+            position: relative;
+        }
+        
+        .unread-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ef4444;
+            color: white;
+            font-size: 0.625rem;
+            padding: 2px 5px;
+            border-radius: 10px;
+            min-width: 16px;
+            text-align: center;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-xl);
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .close-modal {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            background: white;
+            border-radius: var(--radius-xl);
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+        
+        .error-state {
+            text-align: center;
+            padding: 60px;
+            background: white;
+            border-radius: var(--radius-xl);
+        }
+        
+        .error-state i {
+            font-size: 4rem;
+            color: #ef4444;
+            margin-bottom: 20px;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .course-hero {
+                flex-direction: column;
+            }
+            .course-hero-image {
+                width: 100%;
+            }
+            .lesson-nav {
+                flex-direction: column;
+            }
+            .lesson-nav button {
+                width: 100%;
+            }
+            .lesson-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .lesson-right {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+            }
+            .tabs {
+                gap: 15px;
+            }
+            .tab-btn {
+                font-size: 0.875rem;
+            }
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+            .notice-box {
+                flex-direction: column;
+                text-align: center;
+            }
+            .notice-content {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div>
+            <div class="sidebar-header">
+                <i class="fas fa-graduation-cap"></i>
+                <h2>Edunova<br><span>Smart Learning</span></h2>
+            </div>
+            <nav class="sidebar-menu">
+                <div class="menu-item" data-page="dashboard">
+                    <i class="fas fa-house"></i> Dashboard
+                </div>
+                <div class="menu-item" data-page="courses">
+                    <i class="fas fa-book-open"></i> My Courses
+                </div>
+                <div class="menu-item" data-page="quizzes">
+                    <i class="fas fa-question-circle"></i> Quizzes
+                </div>
+                <div class="menu-item" data-page="messages">
+                    <i class="fas fa-envelope message-badge"></i> Messages
+                    <span id="sidebarMessageBadge" class="unread-count" style="display: none;">0</span>
+                </div>
+                <div class="menu-item" data-page="profile">
+                    <i class="fas fa-user"></i> Profile
+                </div>
+                <div class="menu-item" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </div>
+            </nav>
+        </div>
+        <div class="upgrade-card">
+            <h3>Upgrade Your Learning</h3>
+            <p>Unlock premium courses, certificates and much more.</p>
+            <button class="btn btn-primary">Upgrade Now</button>
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135755.png" alt="">
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="menu-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Search lessons...">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="notification" onclick="openNotificationsModal()">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="notificationBadge">0</span>
+                </div>
+                <div class="profile" onclick="window.location.href='profile.html'">
+                    <img src="../../uploads/profiles/default.jpg" alt="Profile" class="profile-img" id="profileImg">
+                    <div class="profile-info">
+                        <h4 id="userName">Loading...</h4>
+                        <p>Student</p>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="content-area" id="contentArea">
+            <!-- Notice Box -->
+            <div class="notice-box" id="noticeBox">
+                <div class="notice-content">
+                    <div class="notice-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="notice-text">
+                        <div class="notice-title">📚 Learning Tips!</div>
+                        <div class="notice-message" id="noticeMessage">Complete lessons in order for the best learning experience. Don't forget to mark lessons as complete!</div>
+                    </div>
+                </div>
+                <div class="notice-close" onclick="dismissNotice()">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+
+            <!-- Announcement Banner -->
+            <div class="announcement-banner" id="announcementBanner" onclick="viewAnnouncements()" style="display: none;">
+                <div class="announcement-icon">
+                    <i class="fas fa-bullhorn"></i>
+                </div>
+                <div class="announcement-text">
+                    <div class="announcement-title" id="latestAnnouncementTitle">New Announcement</div>
+                    <div class="announcement-date" id="latestAnnouncementDate">Just now</div>
+                </div>
+                <i class="fas fa-chevron-right" style="color: #4338ca;"></i>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="loading" style="text-align: center; padding: 60px;">
+                <div class="loading-spinner"></div>
+                <p>Loading course content...</p>
+            </div>
+
+            <!-- Course Content -->
+            <div id="courseContent" style="display: none;">
+                <!-- Back Link -->
+                <div style="margin-bottom: 20px;">
+                    <a href="courses.html" style="color: var(--primary);">
+                        <i class="fas fa-arrow-left"></i> Back to My Courses
+                    </a>
+                </div>
+
+                <!-- Video/PDF Player Section -->
+                <div class="video-player-section" id="contentPlayer">
+                    <div class="video-container" id="contentContainer">
+                        <!-- Content will be dynamically loaded -->
+                    </div>
+                    <div class="video-info">
+                        <h2 class="current-lesson-title" id="currentContentTitle">Select a lesson to start learning</h2>
+                        <p class="current-lesson-description" id="currentContentDescription"></p>
+                        <div class="lesson-nav">
+                            <button class="btn btn-outline" id="prevBtn" onclick="navigateLesson(-1)">
+                                <i class="fas fa-chevron-left"></i> Previous
+                            </button>
+                            <button class="btn btn-success" id="markCompleteBtn" onclick="markLessonComplete()">
+                                <i class="fas fa-check-circle"></i> Mark as Complete
+                            </button>
+                            <button class="btn btn-primary" id="nextBtn" onclick="navigateLesson(1)">
+                                Next <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Course Hero -->
+                <div class="course-hero" id="courseHero">
+                    <div class="course-hero-image">
+                        <img id="courseImage" src="" alt="Course">
+                    </div>
+                    <div class="course-hero-info">
+                        <h1 id="courseTitle"></h1>
+                        <p id="courseDescription"></p>
+                        <div class="course-meta" id="courseMeta"></div>
+                        <div>
+                            <div class="progress-text" style="margin-bottom: 8px;">
+                                <span>Overall Progress</span>
+                                <strong id="progressPercent">0%</strong>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="card">
+                    <div class="tabs">
+                        <button class="tab-btn active" data-tab="content">Course Content</button>
+                        <button class="tab-btn" data-tab="resources">Resources</button>
+                        <button class="tab-btn" data-tab="about">About Course</button>
+                    </div>
+                    <div class="card-body">
+                        <div id="contentTab">
+                            <div id="modulesContainer"></div>
+                        </div>
+                        <div id="resourcesTab" style="display: none;">
+                            <div id="resourcesContent"></div>
+                        </div>
+                        <div id="aboutTab" style="display: none;">
+                            <div id="aboutContent"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error State -->
+            <div id="errorState" class="error-state" style="display: none;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Unable to Load Course</h3>
+                <p id="errorMessage"></p>
+                <button class="btn btn-primary" onclick="location.reload()">Try Again</button>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Notifications Modal -->
+<div class="modal" id="notificationsModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-bell"></i> Notifications</h3>
+            <span class="close-modal" onclick="closeNotificationsModal()">&times;</span>
+        </div>
+        <div id="notificationsList" style="max-height: 400px; overflow-y: auto;">
+            <div class="loading">Loading notifications...</div>
+        </div>
+        <div style="padding: 15px; text-align: center; border-top: 1px solid var(--border);">
+            <button class="btn btn-outline btn-sm" onclick="markAllNotificationsRead()">Mark All as Read</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============================================
+    // COURSE DETAILS PAGE WITH NOTIFICATIONS
+    // ============================================
+    
+    const API_BASE = 'http://localhost/edunova/api';
+    let courseData = null;
+    let currentLesson = null;
+    let currentModuleIndex = 0;
+    let currentLessonIndex = 0;
+    let unreadMessages = 0;
+    let unreadNotifications = 0;
+    let noticeInterval = null;
+    
+    // Notice messages rotation
+    const noticeMessages = [
+        "📚 Complete lessons in order for the best learning experience. Don't forget to mark lessons as complete!",
+        "🎥 Watch YouTube videos directly in the course player - no need to leave the page!",
+        "📄 PDF documents can be viewed inline or downloaded for offline reading.",
+        "⭐ Rate the course after completion to help other students!",
+        "💬 Have questions? Send a message to your instructor through the Messages section!"
+    ];
+    let currentNoticeIndex = 0;
+    
+    // PDF.js configuration
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    let pdfDoc = null;
+    let currentPage = 1;
+    let totalPages = 0;
+    
+    // Get course ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const courseId = urlParams.get('id');
+    
+    // ============================================
+    // Helper Functions
+    // ============================================
+    
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('open');
+    }
+    
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diff = now - date;
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        
+        if (days === 0) {
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            if (hours === 0) return 'Just now';
+            return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+        } else if (days === 1) {
+            return 'Yesterday';
+        } else if (days < 7) {
+            return `${days} days ago`;
+        } else {
+            return date.toLocaleDateString();
+        }
+    }
+    
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    // ============================================
+    // Notice Box Functions
+    // ============================================
+    
+    function rotateNoticeMessage() {
+        currentNoticeIndex = (currentNoticeIndex + 1) % noticeMessages.length;
+        const noticeMessage = document.getElementById('noticeMessage');
+        if (noticeMessage) {
+            noticeMessage.style.opacity = '0';
+            setTimeout(() => {
+                noticeMessage.innerText = noticeMessages[currentNoticeIndex];
+                noticeMessage.style.opacity = '1';
+            }, 300);
+        }
+    }
+    
+    function dismissNotice() {
+        document.getElementById('noticeBox').style.display = 'none';
+        localStorage.setItem('courseNoticeDismissed', 'true');
+        if (noticeInterval) {
+            clearInterval(noticeInterval);
+        }
+    }
+    
+    function checkNoticeStatus() {
+        const dismissed = localStorage.getItem('courseNoticeDismissed');
+        if (dismissed === 'true') {
+            document.getElementById('noticeBox').style.display = 'none';
+        } else {
+            document.getElementById('noticeBox').style.display = 'flex';
+            noticeInterval = setInterval(rotateNoticeMessage, 10000);
+        }
+    }
+    
+    // ============================================
+    // Notifications Functions
+    // ============================================
+    
+    async function loadNotifications() {
+        const token = localStorage.getItem('edunova_token');
+        if (!token) return;
+        
+        try {
+            const response = await fetch(`${API_BASE}/students/get_notifications.php?limit=5`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                unreadNotifications = data.unread_count || 0;
+                const badge = document.getElementById('notificationBadge');
+                badge.innerText = unreadNotifications > 9 ? '9+' : unreadNotifications;
+                badge.style.display = unreadNotifications > 0 ? 'inline-flex' : 'none';
+            }
+        } catch (error) {
+            console.error('Error loading notifications:', error);
+        }
+    }
+    
+    async function loadUnreadMessages() {
+        const token = localStorage.getItem('edunova_token');
+        if (!token) return;
+        
+        try {
+            const response = await fetch(`${API_BASE}/students/get_messages.php?type=inbox`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                unreadMessages = data.unread_count || 0;
+                const badge = document.getElementById('sidebarMessageBadge');
+                if (unreadMessages > 0) {
+                    badge.style.display = 'inline-block';
+                    badge.innerText = unreadMessages > 9 ? '9+' : unreadMessages;
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        } catch (error) {
+            console.error('Error loading messages:', error);
+        }
+    }
+    
+    async function loadLatestAnnouncement() {
+        const token = localStorage.getItem('edunova_token');
+        if (!token) return;
+        
+        try {
+            const response = await fetch(`${API_BASE}/students/get_announcements.php?limit=1`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            
+            if (data.success && data.announcements && data.announcements.length > 0) {
+                const announcement = data.announcements[0];
+                const banner = document.getElementById('announcementBanner');
+                const titleEl = document.getElementById('latestAnnouncementTitle');
+                const dateEl = document.getElementById('latestAnnouncementDate');
+                
+                titleEl.innerText = announcement.title;
+                dateEl.innerText = formatDate(announcement.created_at);
+                banner.style.display = 'flex';
+            }
+        } catch (error) {
+            console.error('Error loading announcement:', error);
+        }
+    }
+    
+    function viewAnnouncements() {
+        openNotificationsModal();
+    }
+    
+    function openNotificationsModal() {
+        const modal = document.getElementById('notificationsModal');
+        modal.classList.add('active');
+        loadNotificationsList();
+    }
+    
+    function closeNotificationsModal() {
+        document.getElementById('notificationsModal').classList.remove('active');
+    }
+    
+    async function loadNotificationsList() {
+        const token = localStorage.getItem('edunova_token');
+        const container = document.getElementById('notificationsList');
+        
+        try {
+            const response = await fetch(`${API_BASE}/students/get_notifications.php?limit=20`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            
+            if (data.success && data.notifications && data.notifications.length > 0) {
+                container.innerHTML = data.notifications.map(notif => `
+                    <div class="activity-item" style="cursor: pointer; padding: 12px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 12px;" onclick="markNotificationRead(${notif.id}, '${notif.link}')">
+                        <div class="activity-icon" style="width: 36px; height: 36px; background: #f0e6ff; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #5b34ea;">
+                            <i class="fas ${notif.type === 'message' ? 'fa-envelope' : notif.type === 'announcement' ? 'fa-bullhorn' : 'fa-bell'}"></i>
+                        </div>
+                        <div class="activity-content" style="flex: 1;">
+                            <div class="activity-title" style="font-weight: 600; font-size: 0.875rem;">${escapeHtml(notif.title)}</div>
+                            <div class="activity-time" style="font-size: 0.7rem; color: var(--gray);">${formatDate(notif.created_at)}</div>
+                        </div>
+                        ${!notif.is_read ? '<div style="width: 8px; height: 8px; background: #5b34ea; border-radius: 50%;"></div>' : ''}
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<div style="text-align: center; padding: 40px;"><p>No notifications</p></div>';
+            }
+        } catch (error) {
+            container.innerHTML = '<div style="text-align: center; padding: 40px;"><p>Error loading notifications</p></div>';
+        }
+    }
+    
+    async function markNotificationRead(notificationId, link) {
+        const token = localStorage.getItem('edunova_token');
+        
+        await fetch(`${API_BASE}/students/mark_notification_read.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ notification_id: notificationId })
+        });
+        
+        closeNotificationsModal();
+        if (link && link !== 'null') window.location.href = link;
+    }
+    
+    async function markAllNotificationsRead() {
+        const token = localStorage.getItem('edunova_token');
+        
+        await fetch(`${API_BASE}/students/mark_notification_read.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ mark_all: true })
+        });
+        
+        loadNotifications();
+        document.getElementById('notificationBadge').innerText = '0';
+        alert('All notifications marked as read');
+        closeNotificationsModal();
+    }
+    
+    // ============================================
+    // Content Type Handlers
+    // ============================================
+    
+    function loadYouTubeVideo(videoId, title, description) {
+        const container = document.getElementById('contentContainer');
+        const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
+        container.innerHTML = `<iframe src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+        
+        document.getElementById('currentContentTitle').innerText = title;
+        document.getElementById('currentContentDescription').innerText = description || `Watch this video to learn about ${title}`;
+        document.getElementById('contentPlayer').classList.add('active');
+    }
+    
+    function loadVideoFile(videoUrl, title, description) {
+        const container = document.getElementById('contentContainer');
+        container.innerHTML = `<video controls autoplay><source src="${videoUrl}" type="video/mp4">Your browser does not support the video tag.</video>`;
+        
+        document.getElementById('currentContentTitle').innerText = title;
+        document.getElementById('currentContentDescription').innerText = description || `Watch this video to learn about ${title}`;
+        document.getElementById('contentPlayer').classList.add('active');
+    }
+    
+    async function loadPDF(pdfUrl, title, description) {
+        const container = document.getElementById('contentContainer');
+        container.innerHTML = `
+            <div class="pdf-viewer">
+                <div class="pdf-controls">
+                    <button onclick="prevPage()"><i class="fas fa-chevron-left"></i> Previous</button>
+                    <span>Page <span id="pageNum">1</span> of <span id="pageCount">0</span></span>
+                    <button onclick="nextPage()">Next <i class="fas fa-chevron-right"></i></button>
+                    <button onclick="downloadFile('${pdfUrl}', '${title}')"><i class="fas fa-download"></i> Download PDF</button>
+                </div>
+                <div class="pdf-canvas-container">
+                    <canvas id="pdfCanvas"></canvas>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('currentContentTitle').innerText = title;
+        document.getElementById('currentContentDescription').innerText = description || `Read this PDF document to learn more.`;
+        document.getElementById('contentPlayer').classList.add('active');
+        
+        try {
+            const loadingTask = pdfjsLib.getDocument(pdfUrl);
+            pdfDoc = await loadingTask.promise;
+            totalPages = pdfDoc.numPages;
+            document.getElementById('pageCount').innerText = totalPages;
+            renderPage(1);
+        } catch (error) {
+            console.error('Error loading PDF:', error);
+            container.innerHTML = `
+                <div class="document-viewer">
+                    <i class="fas fa-file-pdf"></i>
+                    <h3>Unable to load PDF</h3>
+                    <p>Click the button below to download the file.</p>
+                    <a href="${pdfUrl}" download class="download-btn"><i class="fas fa-download"></i> Download PDF</a>
+                </div>
+            `;
+        }
+    }
+    
+    function renderPage(pageNum) {
+        pdfDoc.getPage(pageNum).then(page => {
+            const canvas = document.getElementById('pdfCanvas');
+            const ctx = canvas.getContext('2d');
+            const viewport = page.getViewport({ scale: 1.5 });
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            
+            const renderContext = {
+                canvasContext: ctx,
+                viewport: viewport
+            };
+            page.render(renderContext);
+            document.getElementById('pageNum').innerText = pageNum;
+            currentPage = pageNum;
+        });
+    }
+    
+    function prevPage() {
+        if (currentPage <= 1) return;
+        renderPage(currentPage - 1);
+    }
+    
+    function nextPage() {
+        if (currentPage >= totalPages) return;
+        renderPage(currentPage + 1);
+    }
+    
+    function loadDocument(fileUrl, fileType, title, description) {
+        const container = document.getElementById('contentContainer');
+        let icon = 'fa-file-alt';
+        let color = '#6c757d';
+        
+        if (fileType === 'pdf') {
+            icon = 'fa-file-pdf';
+            color = '#ef4444';
+        } else if (fileType === 'doc' || fileType === 'docx') {
+            icon = 'fa-file-word';
+            color = '#3b82f6';
+        } else if (fileType === 'ppt' || fileType === 'pptx') {
+            icon = 'fa-file-powerpoint';
+            color = '#f59e0b';
+        } else {
+            icon = 'fa-file-alt';
+            color = '#6c757d';
+        }
+        
+        container.innerHTML = `
+            <div class="document-viewer">
+                <i class="fas ${icon}" style="color: ${color};"></i>
+                <h3>${title}</h3>
+                <p>${description || 'Download this document to view its contents.'}</p>
+                <a href="${fileUrl}" download class="download-btn"><i class="fas fa-download"></i> Download File</a>
+            </div>
+        `;
+        
+        document.getElementById('currentContentTitle').innerText = title;
+        document.getElementById('currentContentDescription').innerText = description || 'Download this document to continue learning.';
+        document.getElementById('contentPlayer').classList.add('active');
+    }
+    
+    function loadTextLesson(content, title, description) {
+        const container = document.getElementById('contentContainer');
+        container.innerHTML = `
+            <div class="document-viewer" style="text-align: left; padding: 30px;">
+                <div style="max-width: 800px; margin: 0 auto;">
+                    ${content || '<p>No content available for this lesson.</p>'}
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('currentContentTitle').innerText = title;
+        document.getElementById('currentContentDescription').innerText = description || 'Read the lesson content below.';
+        document.getElementById('contentPlayer').classList.add('active');
+    }
+    
+    function downloadFile(fileUrl, fileName) {
+        const link = document.createElement('a');
+        link.href = fileUrl;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    
+    // ============================================
+    // Course Data Loading
+    // ============================================
+    
+    function showLoading() {
+        document.getElementById('loadingState').style.display = 'block';
+        document.getElementById('courseContent').style.display = 'none';
+        document.getElementById('errorState').style.display = 'none';
+    }
+    
+    function showContent() {
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('courseContent').style.display = 'block';
+        document.getElementById('errorState').style.display = 'none';
+    }
+    
+    function showError(message) {
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('courseContent').style.display = 'none';
+        document.getElementById('errorState').style.display = 'block';
+        document.getElementById('errorMessage').innerText = message;
+    }
+    
+    async function loadCourse() {
+        if (!courseId) {
+            window.location.href = 'courses.html';
+            return;
+        }
+        
+        const token = localStorage.getItem('edunova_token');
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        showLoading();
+        
+        try {
+            const response = await fetch(`${API_BASE}/students/get_course.php?id=${courseId}`, {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                courseData = data.course;
+                displayCourseInfo();
+                displayModules();
+                displayResources();
+                displayAboutContent();
+                autoPlayFirstLesson();
+                showContent();
+            } else if (response.status === 401) {
+                localStorage.removeItem('edunova_token');
+                localStorage.removeItem('edunova_user');
+                window.location.href = 'login.html';
+            } else {
+                showError(data.error || 'Failed to load course');
+            }
+        } catch (error) {
+            console.error('Error loading course:', error);
+            showError('Cannot connect to server.');
+        }
+    }
+    
+    function autoPlayFirstLesson() {
+        for (let m = 0; m < courseData.modules.length; m++) {
+            for (let l = 0; l < courseData.modules[m].lessons.length; l++) {
+                const lesson = courseData.modules[m].lessons[l];
+                if (!lesson.is_completed) {
+                    playLesson(m, l);
+                    return;
+                }
+            }
+        }
+        if (courseData.modules[0]?.lessons[0]) {
+            playLesson(0, 0);
+        }
+    }
+    
+    // ============================================
+    // Display Functions
+    // ============================================
+    
+    function displayCourseInfo() {
+        document.getElementById('courseTitle').innerText = courseData.title;
+        document.getElementById('courseDescription').innerText = courseData.description || 'No description available.';
+        document.getElementById('courseImage').src = courseData.image || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400';
+        
+        document.getElementById('courseMeta').innerHTML = `
+            <span><i class="fas fa-star" style="color: #fbbf24;"></i> ${courseData.rating || '4.8'}</span>
+            <span><i class="fas fa-users"></i> ${(courseData.enrollments_count || 0).toLocaleString()} students</span>
+            <span><i class="fas fa-chart-line"></i> ${courseData.level || 'Beginner'}</span>
+            <span><i class="fas fa-clock"></i> ${courseData.duration_hours || 10}+ hours</span>
+        `;
+        
+        const progress = courseData.progress_percent || 0;
+        document.getElementById('progressPercent').innerText = `${progress}%`;
+        document.getElementById('progressFill').style.width = `${progress}%`;
+        
+        const storedUser = localStorage.getItem('edunova_user');
+        if (storedUser) {
+            try {
+                const user = JSON.parse(storedUser);
+                document.getElementById('userName').innerText = user.name || 'Student';
+                if (user.profile_image) {
+                    document.getElementById('profileImg').src = '../../' + user.profile_image;
+                }
+            } catch(e) {}
+        }
+    }
+    
+    function displayModules() {
+        const container = document.getElementById('modulesContainer');
+        let html = '';
+        
+        courseData.modules.forEach((module, mIndex) => {
+            const completedCount = module.completed_lessons || module.lessons.filter(l => l.is_completed).length;
+            const totalCount = module.total_lessons || module.lessons.length;
+            const moduleProgress = module.progress_percent || Math.round((completedCount / totalCount) * 100);
+            
+            html += `
+                <div class="module-item">
+                    <div class="module-header" onclick="toggleModule(${mIndex})">
+                        <h3>
+                            <i class="fas ${moduleProgress === 100 ? 'fa-check-circle' : 'fa-folder-open'}" style="color: ${moduleProgress === 100 ? 'var(--success)' : 'var(--primary)'}"></i>
+                            ${escapeHtml(module.title)}
+                        </h3>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span class="module-progress">${completedCount}/${totalCount} Lessons (${moduleProgress}%)</span>
+                            <i class="fas fa-chevron-down module-icon" id="moduleIcon${mIndex}"></i>
+                        </div>
+                    </div>
+                    <div class="lesson-list" id="moduleLessons${mIndex}" style="display: ${mIndex === 0 ? 'block' : 'none'}">
+            `;
+            
+            module.lessons.forEach((lesson, lIndex) => {
+                let badgeClass = '';
+                let badgeIcon = '';
+                let badgeText = '';
+                
+                if (lesson.youtube_url) {
+                    badgeClass = 'badge-youtube';
+                    badgeIcon = 'fab fa-youtube';
+                    badgeText = 'YouTube';
+                } else if (lesson.lesson_type === 'video' || lesson.video_url) {
+                    badgeClass = 'badge-video';
+                    badgeIcon = 'fas fa-video';
+                    badgeText = 'Video';
+                } else if (lesson.file_path && lesson.file_path.endsWith('.pdf')) {
+                    badgeClass = 'badge-pdf';
+                    badgeIcon = 'fas fa-file-pdf';
+                    badgeText = 'PDF';
+                } else if (lesson.file_path) {
+                    badgeClass = 'badge-document';
+                    badgeIcon = 'fas fa-file-alt';
+                    badgeText = 'Document';
+                } else if (lesson.lesson_type === 'text') {
+                    badgeClass = 'badge-text';
+                    badgeIcon = 'fas fa-align-left';
+                    badgeText = 'Text';
+                }
+                
+                html += `
+                    <div class="lesson-item" data-module="${mIndex}" data-lesson="${lIndex}" onclick="playLesson(${mIndex}, ${lIndex})">
+                        <div class="lesson-left">
+                            <i class="fas ${badgeIcon || 'fa-play-circle'}" style="color: ${badgeClass === 'badge-youtube' ? '#ff0000' : 'var(--primary)'}"></i>
+                            <span>${escapeHtml(lesson.title)}
+                                ${badgeText ? `<span class="lesson-type-badge ${badgeClass}"><i class="${badgeIcon}"></i> ${badgeText}</span>` : ''}
+                            </span>
+                        </div>
+                        <div class="lesson-right">
+                            <span class="lesson-duration">${lesson.duration_minutes ? lesson.duration_minutes + ' min' : ''}</span>
+                            ${lesson.is_completed ? '<i class="fas fa-check-circle lesson-completed"></i>' : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `</div></div>`;
+        });
+        
+        container.innerHTML = html;
+    }
+    
+    function displayResources() {
+        const container = document.getElementById('resourcesContent');
+        
+        const resources = [
+            { type: 'pdf', title: 'Course Syllabus', description: 'Complete course outline and learning objectives', url: '#', icon: 'fa-file-pdf', color: '#ef4444' },
+            { type: 'video', title: 'Introduction Video', description: 'Watch this overview of the course', url: '#', icon: 'fa-video', color: '#3b82f6' },
+            { type: 'document', title: 'Study Guide', description: 'Supplementary study materials', url: '#', icon: 'fa-file-alt', color: '#f59e0b' },
+            { type: 'link', title: 'Useful Links', description: 'Additional learning resources', url: '#', icon: 'fa-link', color: '#10b981' }
+        ];
+        
+        container.innerHTML = `
+            <div class="resources-grid">
+                ${resources.map(resource => `
+                    <div class="resource-card" onclick="window.open('${resource.url}', '_blank')">
+                        <div class="resource-icon ${resource.type}" style="background: ${resource.color}20; color: ${resource.color};">
+                            <i class="fas ${resource.icon}"></i>
+                        </div>
+                        <div class="resource-info">
+                            <h4>${resource.title}</h4>
+                            <p>${resource.description}</p>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="empty-state" style="margin-top: 20px;">
+                <i class="fas fa-info-circle"></i>
+                <p>More resources will be added as the course progresses.</p>
+            </div>
+        `;
+    }
+    
+    function displayAboutContent() {
+        const container = document.getElementById('aboutContent');
+        container.innerHTML = `
+            <h3>About This Course</h3>
+            <p style="margin-bottom: 20px;">${escapeHtml(courseData.description || 'No description available.')}</p>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                <div><strong>Instructor:</strong> ${escapeHtml(courseData.instructor_name || 'Expert Instructor')}</div>
+                <div><strong>Language:</strong> English</div>
+                <div><strong>Certificate:</strong> ${courseData.progress_percent >= 100 ? 'Yes (Earned)' : 'Yes (Upon completion)'}</div>
+                <div><strong>Level:</strong> ${escapeHtml(courseData.level || 'Beginner')}</div>
+                <div><strong>Total Lessons:</strong> ${courseData.total_lessons || 0}</div>
+                <div><strong>Last Updated:</strong> ${new Date().toLocaleDateString()}</div>
+            </div>
+            <div style="margin-top: 20px;">
+                <h4>What You'll Learn</h4>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Master the fundamentals of ${courseData.title}</li>
+                    <li>Build real-world projects and applications</li>
+                    <li>Get hands-on experience with practical exercises</li>
+                    <li>Earn a certificate upon completion</li>
+                </ul>
+            </div>
+            ${courseData.progress_percent >= 100 ? `
+            <div style="margin-top: 20px; padding: 15px; background: #e3f9ee; border-radius: 10px;">
+                <i class="fas fa-trophy" style="color: var(--success);"></i>
+                <strong>Congratulations!</strong> You have completed this course.
+            </div>
+            ` : ''}
+        `;
+    }
+    
+    // ============================================
+    // Lesson Functions
+    // ============================================
+    
+    function toggleModule(moduleIndex) {
+        const lessonList = document.getElementById(`moduleLessons${moduleIndex}`);
+        const icon = document.getElementById(`moduleIcon${moduleIndex}`);
+        
+        if (lessonList.style.display === 'none') {
+            lessonList.style.display = 'block';
+            icon.style.transform = 'rotate(0deg)';
+        } else {
+            lessonList.style.display = 'none';
+            icon.style.transform = 'rotate(180deg)';
+        }
+    }
+    
+    function playLesson(moduleIndex, lessonIndex) {
+        const module = courseData.modules[moduleIndex];
+        const lesson = module.lessons[lessonIndex];
+        
+        if (!lesson) return;
+        
+        currentModuleIndex = moduleIndex;
+        currentLessonIndex = lessonIndex;
+        currentLesson = lesson;
+        
+        document.querySelectorAll('.lesson-item').forEach(el => el.classList.remove('active'));
+        const activeLesson = document.querySelector(`.lesson-item[data-module="${moduleIndex}"][data-lesson="${lessonIndex}"]`);
+        if (activeLesson) activeLesson.classList.add('active');
+        
+        const markBtn = document.getElementById('markCompleteBtn');
+        
+        if (lesson.youtube_url) {
+            let videoId = extractYouTubeId(lesson.youtube_url);
+            if (videoId) {
+                loadYouTubeVideo(videoId, lesson.title, lesson.content);
+            } else {
+                loadTextLesson('Invalid YouTube URL. Please contact support.', lesson.title, lesson.content);
+            }
+        } else if (lesson.video_url) {
+            loadVideoFile(lesson.video_url, lesson.title, lesson.content);
+        } else if (lesson.file_path) {
+            if (lesson.file_path.endsWith('.pdf')) {
+                loadPDF(lesson.file_path, lesson.title, lesson.content);
+            } else {
+                loadDocument(lesson.file_path, 'doc', lesson.title, lesson.content);
+            }
+        } else if (lesson.lesson_type === 'text' || lesson.content) {
+            loadTextLesson(lesson.content, lesson.title, lesson.content);
+        } else {
+            loadTextLesson('Lesson content coming soon.', lesson.title, lesson.content);
+        }
+        
+        if (lesson.is_completed) {
+            markBtn.innerHTML = '<i class="fas fa-check-circle"></i> Completed';
+            markBtn.disabled = true;
+            markBtn.style.opacity = '0.6';
+        } else {
+            markBtn.innerHTML = '<i class="fas fa-check-circle"></i> Mark as Complete';
+            markBtn.disabled = false;
+            markBtn.style.opacity = '1';
+        }
+        
+        if (window.innerWidth <= 768) {
+            document.getElementById('contentPlayer').scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+    
+    function extractYouTubeId(url) {
+        const patterns = [
+            /(?:youtube\.com\/watch\?v=)([^&]+)/,
+            /(?:youtu\.be\/)([^?]+)/,
+            /(?:youtube\.com\/embed\/)([^?]+)/,
+            /(?:youtube\.com\/shorts\/)([^?]+)/
+        ];
+        for (const pattern of patterns) {
+            const match = url.match(pattern);
+            if (match) return match[1];
+        }
+        return null;
+    }
+    
+    async function markLessonComplete() {
+        if (!currentLesson || currentLesson.is_completed) return;
+        
+        const token = localStorage.getItem('edunova_token');
+        const markBtn = document.getElementById('markCompleteBtn');
+        
+        markBtn.disabled = true;
+        markBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Updating...';
+        
+        try {
+            const response = await fetch(`${API_BASE}/students/update_progress.php`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    lesson_id: currentLesson.id,
+                    course_id: courseId,
+                    completed: 1
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                currentLesson.is_completed = true;
+                markBtn.innerHTML = '<i class="fas fa-check-circle"></i> Completed';
+                markBtn.disabled = true;
+                markBtn.style.opacity = '0.6';
+                
+                const lessonItem = document.querySelector(`.lesson-item[data-module="${currentModuleIndex}"][data-lesson="${currentLessonIndex}"]`);
+                if (lessonItem) {
+                    const rightSide = lessonItem.querySelector('.lesson-right');
+                    if (rightSide && !rightSide.querySelector('.lesson-completed')) {
+                        const checkIcon = document.createElement('i');
+                        checkIcon.className = 'fas fa-check-circle lesson-completed';
+                        rightSide.appendChild(checkIcon);
+                    }
+                }
+                
+                let totalLessons = 0, totalCompleted = 0;
+                courseData.modules.forEach(mod => {
+                    mod.lessons.forEach(lesson => {
+                        totalLessons++;
+                        if (lesson.is_completed) totalCompleted++;
+                    });
+                });
+                const newProgress = Math.round((totalCompleted / totalLessons) * 100);
+                courseData.progress_percent = newProgress;
+                document.getElementById('progressPercent').innerText = `${newProgress}%`;
+                document.getElementById('progressFill').style.width = `${newProgress}%`;
+                
+                alert('✅ Lesson marked as complete!');
+            } else {
+                alert(data.error || 'Failed to update progress');
+                markBtn.disabled = false;
+                markBtn.innerHTML = '<i class="fas fa-check-circle"></i> Mark as Complete';
+            }
+        } catch (error) {
+            alert('Network error. Please try again.');
+            markBtn.disabled = false;
+            markBtn.innerHTML = '<i class="fas fa-check-circle"></i> Mark as Complete';
+        }
+    }
+    
+    function navigateLesson(direction) {
+        let allLessons = [];
+        courseData.modules.forEach((module, mIndex) => {
+            module.lessons.forEach((lesson, lIndex) => {
+                allLessons.push({ moduleIndex: mIndex, lessonIndex: lIndex });
+            });
+        });
+        
+        let currentIndex = -1;
+        for (let i = 0; i < allLessons.length; i++) {
+            if (allLessons[i].moduleIndex === currentModuleIndex && allLessons[i].lessonIndex === currentLessonIndex) {
+                currentIndex = i;
+                break;
+            }
+        }
+        
+        const newIndex = currentIndex + direction;
+        if (newIndex >= 0 && newIndex < allLessons.length) {
+            const next = allLessons[newIndex];
+            playLesson(next.moduleIndex, next.lessonIndex);
+        }
+    }
+    
+    // ============================================
+    // Search and Navigation
+    // ============================================
+    
+    function initSearch() {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                const term = e.target.value.toLowerCase();
+                const lessons = document.querySelectorAll('.lesson-item');
+                lessons.forEach(lesson => {
+                    const title = lesson.querySelector('.lesson-left span')?.innerText.toLowerCase() || '';
+                    if (title.includes(term)) {
+                        lesson.style.display = '';
+                        const moduleDiv = lesson.closest('.lesson-list');
+                        if (moduleDiv) moduleDiv.style.display = 'block';
+                    } else {
+                        lesson.style.display = 'none';
+                    }
+                });
+            });
+        }
+    }
+    
+    function initTabs() {
+        const tabs = document.querySelectorAll('.tab-btn');
+        const contentTab = document.getElementById('contentTab');
+        const resourcesTab = document.getElementById('resourcesTab');
+        const aboutTab = document.getElementById('aboutTab');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                contentTab.style.display = 'none';
+                resourcesTab.style.display = 'none';
+                aboutTab.style.display = 'none';
+                
+                if (tabName === 'content') contentTab.style.display = 'block';
+                else if (tabName === 'resources') resourcesTab.style.display = 'block';
+                else aboutTab.style.display = 'block';
+            });
+        });
+    }
+    
+    function initNavigation() {
+        document.querySelectorAll('.menu-item[data-page]').forEach(item => {
+            item.addEventListener('click', () => {
+                const page = item.dataset.page;
+                if (page === 'dashboard') window.location.href = 'dashboard.html';
+                else if (page === 'courses') window.location.href = 'courses.html';
+                else if (page === 'quizzes') window.location.href = 'quiz.html';
+                else if (page === 'messages') window.location.href = 'messages.html';
+                else if (page === 'profile') window.location.href = 'profile.html';
+            });
+        });
+        
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('edunova_token');
+            localStorage.removeItem('edunova_user');
+            window.location.href = 'login.html';
+        });
+    }
+    
+    function initSidebarClose() {
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.querySelector('.menu-toggle');
+            if (window.innerWidth <= 1024 && sidebar?.classList.contains('open')) {
+                if (!sidebar.contains(event.target) && !menuToggle?.contains(event.target)) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+    }
+    
+    // Close modal on outside click
+    window.onclick = function(event) {
+        const modal = document.getElementById('notificationsModal');
+        if (event.target === modal) {
+            closeNotificationsModal();
+        }
+    }
+    
+    // Make functions global
+    window.prevPage = prevPage;
+    window.nextPage = nextPage;
+    window.downloadFile = downloadFile;
+    window.toggleSidebar = toggleSidebar;
+    window.toggleModule = toggleModule;
+    window.playLesson = playLesson;
+    window.markLessonComplete = markLessonComplete;
+    window.navigateLesson = navigateLesson;
+    window.openNotificationsModal = openNotificationsModal;
+    window.closeNotificationsModal = closeNotificationsModal;
+    window.markAllNotificationsRead = markAllNotificationsRead;
+    window.markNotificationRead = markNotificationRead;
+    window.viewAnnouncements = viewAnnouncements;
+    window.dismissNotice = dismissNotice;
+    
+    // Initialize
+    async function init() {
+        checkNoticeStatus();
+        initNavigation();
+        initSidebarClose();
+        initTabs();
+        initSearch();
+        await loadCourse();
+        await loadNotifications();
+        await loadUnreadMessages();
+        await loadLatestAnnouncement();
+    }
+    
+    init();
+</script>
+
+<style>
+    .upgrade-card {
+        background: white;
+        border-radius: var(--radius-xl);
+        padding: 20px;
+        margin-top: 30px;
+        text-align: center;
+    }
+    .upgrade-card h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+    .upgrade-card p {
+        font-size: 0.75rem;
+        color: var(--gray);
+        margin-bottom: 12px;
+    }
+    .upgrade-card img {
+        width: 100px;
+        margin-top: 12px;
+    }
+    .btn-success {
+        background: #22c55e;
+        color: white;
+    }
+    .btn-success:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    .lesson-type-badge {
+        font-size: 0.625rem;
+        padding: 2px 8px;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-left: 8px;
+    }
+    .badge-youtube { background: #ff0000; color: white; }
+    .badge-video { background: #3b82f6; color: white; }
+    .badge-pdf { background: #ef4444; color: white; }
+    .badge-document { background: #f59e0b; color: white; }
+    .badge-text { background: #10b981; color: white; }
+    .activity-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px 20px;
+        border-bottom: 1px solid var(--border);
+    }
+    .activity-item:hover {
+        background: #f8f7fc;
+    }
+    .activity-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .activity-content {
+        flex: 1;
+    }
+    .activity-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+    .activity-time {
+        font-size: 0.7rem;
+        color: var(--gray);
+    }
+</style>
+
+</body>
+</html>

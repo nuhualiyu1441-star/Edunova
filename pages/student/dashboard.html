@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Dashboard - Edunova Smart Learning</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* Additional Dashboard Styles */
+        .welcome-card {
+            background: linear-gradient(135deg, #f5f1ff 0%, #f8f2ff 100%);
+            border-radius: var(--radius-xl);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .welcome-card h1 {
+            font-size: 1.75rem;
+            margin-bottom: 8px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .stat-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .stat-icon.purple { background: #f0e6ff; color: var(--primary); }
+        .stat-icon.green { background: #e3f9ee; color: var(--success); }
+        .stat-icon.blue { background: #e6f0ff; color: var(--info); }
+        .stat-icon.orange { background: #fff0e6; color: var(--warning); }
+        
+        .stat-info h3 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        
+        .stat-info p {
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .section-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .course-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .course-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .course-image {
+            height: 140px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .course-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .course-progress-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .course-body {
+            padding: 16px;
+        }
+        
+        .course-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        
+        .course-description {
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            margin-bottom: 6px;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: #e8e6f7;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+        
+        .continue-btn {
+            width: 100%;
+            padding: 8px;
+            border-radius: var(--radius-lg);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .activity-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .activity-time {
+            font-size: 0.7rem;
+            color: var(--gray);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        /* Message Preview Styles */
+        .message-preview {
+            background: white;
+            border-radius: var(--radius-xl);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .message-header {
+            padding: 15px 20px;
+            background: #f8f7fc;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .message-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .message-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .message-item:hover {
+            background: #f8f7fc;
+        }
+        
+        .message-item.unread {
+            background: #f0ebff;
+        }
+        
+        .message-sender {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .message-subject {
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-top: 4px;
+        }
+        
+        .message-time {
+            font-size: 0.7rem;
+            color: var(--gray);
+        }
+        
+        .view-all-link {
+            color: var(--primary);
+            font-size: 0.75rem;
+            text-decoration: none;
+        }
+        
+        /* Announcement Styles */
+        .announcement-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            background: #fff9f0;
+            position: relative;
+        }
+        
+        .announcement-title {
+            font-weight: 700;
+            font-size: 0.875rem;
+            margin-bottom: 5px;
+        }
+        
+        .announcement-content {
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-bottom: 8px;
+        }
+        
+        .announcement-date {
+            font-size: 0.65rem;
+            color: var(--gray);
+        }
+        
+        .unread-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            position: absolute;
+            right: 15px;
+            top: 18px;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .action-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid var(--border);
+        }
+        
+        .action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+        }
+        
+        .action-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #f0e6ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+        }
+        
+        .action-icon i {
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+        
+        .action-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-xl);
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 25px;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .modal-header h3 {
+            font-size: 1.25rem;
+        }
+        
+        .close-modal {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+        
+        /* Notice Box Styles */
+        .notice-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: var(--radius-lg);
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .notice-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+        
+        .notice-icon {
+            width: 32px;
+            height: 32px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f59e0b;
+            font-size: 1rem;
+        }
+        
+        .notice-text {
+            flex: 1;
+        }
+        
+        .notice-title {
+            font-weight: 700;
+            font-size: 0.875rem;
+            margin-bottom: 2px;
+        }
+        
+        .notice-message {
+            font-size: 0.75rem;
+            color: #92400e;
+        }
+        
+        .notice-close {
+            cursor: pointer;
+            color: #92400e;
+            padding: 5px;
+        }
+        
+        /* Announcement Banner */
+        .announcement-banner {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            border-radius: var(--radius-lg);
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .announcement-banner:hover {
+            transform: translateX(5px);
+        }
+        
+        .announcement-icon {
+            width: 35px;
+            height: 35px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .announcement-text {
+            flex: 1;
+        }
+        
+        .announcement-title {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .announcement-date {
+            font-size: 0.65rem;
+            color: #4338ca;
+        }
+        
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .bottom-grid {
+                grid-template-columns: 1fr;
+            }
+            .welcome-card h1 {
+                font-size: 1.25rem;
+            }
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div>
+            <div class="sidebar-header">
+                <i class="fas fa-graduation-cap"></i>
+                <h2>Edunova<br><span>Smart Learning</span></h2>
+            </div>
+            <nav class="sidebar-menu">
+                <div class="menu-item active" data-page="dashboard">
+                    <i class="fas fa-house"></i> Dashboard
+                </div>
+                <div class="menu-item" data-page="courses">
+                    <i class="fas fa-book-open"></i> My Courses
+                </div>
+                <div class="menu-item" data-page="quizzes">
+                    <i class="fas fa-question-circle"></i> Quizzes
+                </div>
+                <div class="menu-item" data-page="messages">
+                    <i class="fas fa-envelope"></i> Messages
+                    <span id="sidebarMessageBadge" class="badge-unread" style="display: none; margin-left: auto;">0</span>
+                </div>
+                <div class="menu-item" data-page="profile">
+                    <i class="fas fa-user"></i> Profile
+                </div>
+                <div class="menu-item" data-page="logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </div>
+            </nav>
+        </div>
+        <div class="upgrade-card">
+            <h3>Keep learning, keep growing! 🚀</h3>
+            <p>Explore new courses and upgrade your skills today.</p>
+            <button class="btn btn-primary" onclick="window.location.href='courses.html'">Explore Courses</button>
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135755.png" alt="Learning">
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="menu-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Search your courses...">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="notification" onclick="openNotificationsModal()">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="notificationBadge">0</span>
+                </div>
+                <div class="profile" onclick="window.location.href='profile.html'">
+                    <img src="../../uploads/profiles/default.jpg" alt="Profile" class="profile-img" id="profileImg">
+                    <div class="profile-info">
+                        <h4 id="userName">Loading...</h4>
+                        <p>Student</p>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Notice Box -->
+            <div class="notice-box" id="noticeBox">
+                <div class="notice-content">
+                    <div class="notice-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div class="notice-text">
+                        <div class="notice-title">📢 Stay Updated!</div>
+                        <div class="notice-message" id="noticeMessage">New courses added weekly. Check back often for fresh content!</div>
+                    </div>
+                </div>
+                <div class="notice-close" onclick="dismissNotice()">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+
+            <!-- Announcement Banner -->
+            <div class="announcement-banner" id="announcementBanner" onclick="viewAnnouncements()" style="display: none;">
+                <div class="announcement-icon">
+                    <i class="fas fa-bullhorn"></i>
+                </div>
+                <div class="announcement-text">
+                    <div class="announcement-title" id="latestAnnouncementTitle">New Announcement</div>
+                    <div class="announcement-date" id="latestAnnouncementDate">Just now</div>
+                </div>
+                <i class="fas fa-chevron-right" style="color: #4338ca;"></i>
+            </div>
+
+            <!-- Welcome Card -->
+            <div class="welcome-card">
+                <h1 id="welcomeMessage">Welcome back, Student! 👋</h1>
+                <p id="welcomeText">Continue your learning journey and achieve your goals.</p>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="action-card" onclick="openComposeModal()">
+                    <div class="action-icon"><i class="fas fa-pen-alt"></i></div>
+                    <div class="action-title">New Message</div>
+                </div>
+                <div class="action-card" onclick="window.location.href='courses.html'">
+                    <div class="action-icon"><i class="fas fa-book-open"></i></div>
+                    <div class="action-title">Browse Courses</div>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card" onclick="navigateToPage('courses')">
+                    <div class="stat-icon purple"><i class="fas fa-book-open"></i></div>
+                    <div class="stat-info">
+                        <h3 id="enrolledCount">0</h3>
+                        <p>Enrolled Courses</p>
+                    </div>
+                </div>
+                <div class="stat-card" onclick="navigateToPage('courses')">
+                    <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-info">
+                        <h3 id="completedLessons">0</h3>
+                        <p>Lessons Completed</p>
+                    </div>
+                </div>
+                <div class="stat-card" onclick="navigateToPage('quizzes')">
+                    <div class="stat-icon blue"><i class="fas fa-clipboard-list"></i></div>
+                    <div class="stat-info">
+                        <h3 id="quizzesTaken">0</h3>
+                        <p>Quizzes Taken</p>
+                    </div>
+                </div>
+                <div class="stat-card" onclick="navigateToPage('profile')">
+                    <div class="stat-icon orange"><i class="fas fa-trophy"></i></div>
+                    <div class="stat-info">
+                        <h3 id="avgScore">0%</h3>
+                        <p>Average Score</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Courses Section -->
+            <div class="section-header">
+                <h2>My Courses</h2>
+                <a href="javascript:void(0)" onclick="navigateToPage('courses')" class="btn btn-outline btn-sm">View All →</a>
+            </div>
+            <div class="courses-grid" id="coursesContainer">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading your courses...</p>
+                </div>
+            </div>
+
+            <!-- Recent Messages & Announcements -->
+            <div class="bottom-grid">
+                <!-- Recent Messages -->
+                <div class="message-preview">
+                    <div class="message-header">
+                        <h3><i class="fas fa-envelope"></i> Recent Messages</h3>
+                        <a href="javascript:void(0)" onclick="navigateToPage('messages')" class="view-all-link">View All →</a>
+                    </div>
+                    <div class="message-list" id="recentMessages">
+                        <div class="loading">Loading messages...</div>
+                    </div>
+                </div>
+
+                <!-- Recent Announcements -->
+                <div class="message-preview">
+                    <div class="message-header">
+                        <h3><i class="fas fa-bullhorn"></i> Announcements</h3>
+                        <a href="javascript:void(0)" class="view-all-link" onclick="viewAllAnnouncements()">View All →</a>
+                    </div>
+                    <div class="message-list" id="recentAnnouncements">
+                        <div class="loading">Loading announcements...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Continue Learning & Recent Activity -->
+            <div class="bottom-grid" style="margin-top: 20px;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Continue Learning</h3>
+                        <a href="javascript:void(0)" onclick="navigateToPage('courses')" class="btn btn-outline btn-sm">View All</a>
+                    </div>
+                    <div class="card-body">
+                        <div id="continueList">
+                            <div class="loading">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Recent Activity</h3>
+                        <a href="javascript:void(0)" class="btn btn-outline btn-sm" onclick="viewAllActivity()">View All</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="activity-list" id="activityList">
+                            <div class="loading">Loading activity...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Compose Message Modal -->
+<div class="modal" id="composeModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-pen-alt"></i> New Message</h3>
+            <span class="close-modal" onclick="closeComposeModal()">&times;</span>
+        </div>
+        <div class="form-group">
+            <label>To:</label>
+            <select id="recipientSelect" class="form-input">
+                <option value="">Select recipient...</option>
+                <option value="admin">Admin (Support)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Subject:</label>
+            <input type="text" id="messageSubject" class="form-input" placeholder="Enter subject">
+        </div>
+        <div class="form-group">
+            <label>Message:</label>
+            <textarea id="messageContent" rows="5" class="form-textarea" placeholder="Type your message here..."></textarea>
+        </div>
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+            <button class="btn btn-outline" onclick="closeComposeModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="sendMessage()">Send Message</button>
+        </div>
+    </div>
+</div>
+
+<!-- Notifications Modal -->
+<div class="modal" id="notificationsModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-bell"></i> Notifications</h3>
+            <span class="close-modal" onclick="closeNotificationsModal()">&times;</span>
+        </div>
+        <div id="notificationsList" style="max-height: 400px; overflow-y: auto;">
+            <div class="loading">Loading notifications...</div>
+        </div>
+        <div style="margin-top: 15px; text-align: center;">
+            <button class="btn btn-outline btn-sm" onclick="markAllNotificationsRead()">Mark All as Read</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============================================
+    // COMPLETE DASHBOARD - FIXED API CONNECTION
+    // ============================================
+    
+    const API_BASE = 'http://localhost/edunova/api';
+    let noticeInterval = null;
+    
+    // Notice messages rotation
+    const noticeMessages = [
+        "🎉 New courses added weekly! Check back often for fresh content!",
+        "📚 Complete 3 courses this month to earn a special certificate!",
+        "⭐ Rate your completed courses and help other students!",
+        "💬 Have questions? Contact our support team 24/7!",
+        "🚀 Pro tip: Use filters to find your in-progress courses faster!"
+    ];
+    let currentNoticeIndex = 0;
+    
+    // ============================================
+    // Helper Functions
+    // ============================================
+    
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('open');
+    }
+    
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    function formatDate(dateString) {
+        if (!dateString) return 'Unknown';
+        const date = new Date(dateString);
+        const now = new Date();
+        const diff = now - date;
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        
+        if (days === 0) return 'Today';
+        if (days === 1) return 'Yesterday';
+        if (days < 7) return `${days} days ago`;
+        return date.toLocaleDateString();
+    }
+    
+    // ============================================
+    // Notice Box Functions
+    // ============================================
+    
+    function rotateNoticeMessage() {
+        currentNoticeIndex = (currentNoticeIndex + 1) % noticeMessages.length;
+        const noticeMessage = document.getElementById('noticeMessage');
+        if (noticeMessage) {
+            noticeMessage.style.opacity = '0';
+            setTimeout(() => {
+                noticeMessage.innerText = noticeMessages[currentNoticeIndex];
+                noticeMessage.style.opacity = '1';
+            }, 300);
+        }
+    }
+    
+    function dismissNotice() {
+        document.getElementById('noticeBox').style.display = 'none';
+        localStorage.setItem('noticeDismissed', 'true');
+        if (noticeInterval) clearInterval(noticeInterval);
+    }
+    
+    function checkNoticeStatus() {
+        const dismissed = localStorage.getItem('noticeDismissed');
+        if (dismissed === 'true') {
+            document.getElementById('noticeBox').style.display = 'none';
+        } else {
+            document.getElementById('noticeBox').style.display = 'flex';
+            noticeInterval = setInterval(rotateNoticeMessage, 10000);
+        }
+    }
+    
+    // ============================================
+    // Navigation
+    // ============================================
+    
+    function navigateToPage(page) {
+        switch(page) {
+            case 'dashboard': window.location.href = 'dashboard.html'; break;
+            case 'courses': window.location.href = 'courses.html'; break;
+            case 'quizzes': window.location.href = 'quiz.html'; break;
+            case 'messages': window.location.href = 'messages.html'; break;
+            case 'profile': window.location.href = 'profile.html'; break;
+            case 'logout': logout(); break;
+        }
+    }
+    
+    function logout() {
+        localStorage.removeItem('edunova_token');
+        localStorage.removeItem('edunova_user');
+        window.location.href = 'login.html';
+    }
+    
+    // ============================================
+    // Authentication Check
+    // ============================================
+    
+    function checkAuth() {
+        const token = localStorage.getItem('edunova_token');
+        const user = localStorage.getItem('edunova_user');
+        
+        if (!token || !user) {
+            window.location.href = 'login.html';
+            return false;
+        }
+        return true;
+    }
+    
+    function loadUserInfo() {
+        const storedUser = localStorage.getItem('edunova_user');
+        if (storedUser) {
+            try {
+                const user = JSON.parse(storedUser);
+                if (user.name) {
+                    document.getElementById('userName').innerText = user.name;
+                    document.getElementById('welcomeMessage').innerHTML = `Welcome back, ${user.name}! 👋`;
+                }
+                if (user.profile_image && user.profile_image !== 'null') {
+                    document.getElementById('profileImg').src = '../../' + user.profile_image;
+                }
+            } catch(e) {}
+        }
+    }
+    
+    // ============================================
+    // API Data Fetching
+    // ============================================
+    
+    async function loadDashboardData() {
+        const token = localStorage.getItem('edunova_token');
+        
+        try {
+            const response = await fetch(`${API_BASE}/students/dashboard.php`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                updateStats(data.stats);
+                displayCourses(data.courses);
+                displayActivities(data.activities);
+                displayContinueLearning(data.courses);
+            } else if (response.status === 401) {
+                logout();
+            }
+        } catch (error) {
+            console.error('Error loading dashboard:', error);
+        }
+    }
+    
+    function updateStats(stats) {
+        if (stats) {
+            document.getElementById('enrolledCount').innerText = stats.enrolled_courses || 0;
+            document.getElementById('completedLessons').innerText = stats.completed_lessons || 0;
+            document.getElementById('quizzesTaken').innerText = stats.quizzes_taken || 0;
+            document.getElementById('avgScore').innerHTML = (stats.avg_score || 0) + '%';
+        }
+    }
+    
+    function displayCourses(courses) {
+        const container = document.getElementById('coursesContainer');
+        
+        if (!courses || courses.length === 0) {
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-book-open"></i><p>No courses enrolled yet.</p><button class="btn btn-primary" onclick="navigateToPage(\'courses\')">Browse Courses</button></div>';
+            return;
+        }
+        
+        container.innerHTML = courses.slice(0, 3).map(course => `
+            <div class="course-card" onclick="window.location.href='course-details.html?id=${course.id}'">
+                <div class="course-image">
+                    <img src="${course.image || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400'}" alt="${course.title}">
+                    <span class="course-progress-badge">${course.progress_percent || 0}%</span>
+                </div>
+                <div class="course-body">
+                    <h3 class="course-title">${escapeHtml(course.title)}</h3>
+                    <p class="course-description">${escapeHtml((course.description || 'Continue learning and improve your skills.').substring(0, 80))}...</p>
+                    <div class="progress-label"><span>Progress</span><strong>${course.progress_percent || 0}%</strong></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: ${course.progress_percent || 0}%"></div></div>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function displayContinueLearning(courses) {
+        const container = document.getElementById('continueList');
+        const activeCourses = courses?.filter(c => (c.progress_percent || 0) > 0 && (c.progress_percent || 0) < 100) || [];
+        
+        if (activeCourses.length === 0) {
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-play-circle"></i><p>No active courses</p></div>';
+            return;
+        }
+        
+        container.innerHTML = activeCourses.slice(0, 3).map(course => `
+            <div class="activity-item" style="cursor: pointer;" onclick="window.location.href='course-details.html?id=${course.id}'">
+                <div class="activity-icon" style="background: #f0e6ff; color: #5b34ea;"><i class="fas fa-play-circle"></i></div>
+                <div class="activity-content">
+                    <div class="activity-title">${escapeHtml(course.title)}</div>
+                    <div class="activity-time">${course.progress_percent || 0}% complete</div>
+                    <div class="progress-bar" style="margin-top: 8px;"><div class="progress-fill" style="width: ${course.progress_percent || 0}%"></div></div>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function displayActivities(activities) {
+        const container = document.getElementById('activityList');
+        
+        if (!activities || activities.length === 0) {
+            container.innerHTML = '<div class="empty-state"><i class="fas fa-clock"></i><p>No recent activity</p></div>';
+            return;
+        }
+        
+        container.innerHTML = activities.slice(0, 5).map(activity => {
+            let iconClass = 'fa-file-alt', iconBg = '#f0e6ff', iconColor = '#5b34ea';
+            if (activity.action?.toLowerCase().includes('quiz')) {
+                iconClass = 'fa-check-circle'; iconBg = '#e3f9ee'; iconColor = '#22c55e';
+            } else if (activity.action?.toLowerCase().includes('lesson')) {
+                iconClass = 'fa-play-circle'; iconBg = '#e6f0ff'; iconColor = '#3b82f6';
+            }
+            return `
+                <div class="activity-item">
+                    <div class="activity-icon" style="background: ${iconBg}; color: ${iconColor};"><i class="fas ${iconClass}"></i></div>
+                    <div class="activity-content">
+                        <div class="activity-title">${escapeHtml(activity.action || 'Activity')}</div>
+                        <div class="activity-time">${activity.time || formatDate(activity.created_at)}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // ============================================
+    // Messages Functions
+    // ============================================
+    
+    async function loadRecentMessages() {
+        const token = localStorage.getItem('edunova_token');
+        
+        try {
+            const response = await fetch(`${API_BASE}/students/get_messages.php?type=inbox&limit=3`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            
+            const container = document.getElementById('recentMessages');
+            
+            if (data.success && data.messages && data.messages.length > 0) {
+                container.innerHTML = data.messages.map(msg => `
+                    <div class="message-item ${!msg.is_read ? 'unread' : ''}" onclick="navigateToPage('messages')">
+                        <div class="message-sender">${escapeHtml(msg.sender_name || 'Admin')}</div>
+                        <div class="message-subject">${escapeHtml(msg.subject)}</div>
+                        <div class="message-time">${formatDate(msg.created_at)}</div>
+                    </div>
+                `).join('');
+                
+                const badge = document.getElementById('sidebarMessageBadge');
+                if (data.unread_count > 0) {
+                    badge.style.display = 'inline-block';
+                    badge.innerText = data.unread_count > 9 ? '9+' : data.unread_count;
+                }
+            } else {
+                container.innerHTML = '<div class="empty-state"><p>No messages</p></div>';
+            }
+        } catch (error) {
+            console.error('Error loading messages:', error);
+        }
+    }
+    
+    async function loadRecentAnnouncements() {
+        const token = localStorage.getItem('edunova_token');
+        
+        try {
+            const response = await fetch(`${API_BASE}/students/get_announcements.php?limit=3`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            
+            const container = document.getElementById('recentAnnouncements');
+            
+            if (data.success && data.announcements && data.announcements.length > 0) {
+                container.innerHTML = data.announcements.map(ann => `
+                    <div class="announcement-item" onclick="navigateToPage('messages')">
+                        <div class="announcement-title">📢 ${escapeHtml(ann.title)}</div>
+                        <div class="announcement-content">${escapeHtml(ann.content.substring(0, 80))}...</div>
+                        <div class="announcement-date">${formatDate(ann.created_at)}</div>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<div class="empty-state"><p>No announcements</p></div>';
+            }
+        } catch (error) {
+            console.error('Error loading announcements:', error);
+        }
+    }
+    
+    async function loadLatestAnnouncement() {
+        const token = localStorage.getItem('edunova_token');
+        
+        try {
+            const response = await fetch(`${API_BASE}/students/get_announcements.php?limit=1`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            
+            if (data.success && data.announcements && data.announcements.length > 0) {
+                const announcement = data.announcements[0];
+                const banner = document.getElementById('announcementBanner');
+                document.getElementById('latestAnnouncementTitle').innerText = announcement.title;
+                document.getElementById('latestAnnouncementDate').innerText = formatDate(announcement.created_at);
+                banner.style.display = 'flex';
+            }
+        } catch (error) {
+            console.error('Error loading announcement:', error);
+        }
+    }
+    
+    // ============================================
+    // Compose Message
+    // ============================================
+    
+    function openComposeModal() {
+        document.getElementById('composeModal').classList.add('active');
+    }
+    
+    function closeComposeModal() {
+        document.getElementById('composeModal').classList.remove('active');
+        document.getElementById('messageSubject').value = '';
+        document.getElementById('messageContent').value = '';
+    }
+    
+    async function sendMessage() {
+        const recipient = document.getElementById('recipientSelect').value;
+        const subject = document.getElementById('messageSubject').value;
+        const message = document.getElementById('messageContent').value;
+        
+        if (!recipient || !subject || !message) {
+            alert('Please fill in all fields');
+            return;
+        }
+        
+        const token = localStorage.getItem('edunova_token');
+        
+        try {
+            const response = await fetch(`${API_BASE}/students/send_message.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ receiver_id: recipient === 'admin' ? 1 : 2, subject: subject, message: message })
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('Message sent successfully!');
+                closeComposeModal();
+                loadRecentMessages();
+            } else {
+                alert(data.error || 'Failed to send message');
+            }
+        } catch (error) {
+            alert('Network error. Please try again.');
+        }
+    }
+    
+    // ============================================
+    // Notifications
+    // ============================================
+    
+    async function loadNotifications() {
+        const token = localStorage.getItem('edunova_token');
+        
+        try {
+            const response = await fetch(`${API_BASE}/students/get_notifications.php?limit=10`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                document.getElementById('notificationBadge').innerText = data.unread_count || '0';
+                
+                const container = document.getElementById('notificationsList');
+                if (data.notifications && data.notifications.length > 0) {
+                    container.innerHTML = data.notifications.map(notif => `
+                        <div class="activity-item" style="cursor: pointer;" onclick="markNotificationRead(${notif.id})">
+                            <div class="activity-icon" style="background: #f0e6ff; color: #5b34ea;"><i class="fas ${notif.type === 'message' ? 'fa-envelope' : 'fa-bullhorn'}"></i></div>
+                            <div class="activity-content">
+                                <div class="activity-title">${escapeHtml(notif.title)}</div>
+                                <div class="activity-time">${formatDate(notif.created_at)}</div>
+                            </div>
+                            ${!notif.is_read ? '<div class="unread-dot"></div>' : ''}
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<div class="empty-state"><p>No notifications</p></div>';
+                }
+            }
+        } catch (error) {
+            console.error('Error loading notifications:', error);
+        }
+    }
+    
+    function openNotificationsModal() {
+        loadNotifications();
+        document.getElementById('notificationsModal').classList.add('active');
+    }
+    
+    function closeNotificationsModal() {
+        document.getElementById('notificationsModal').classList.remove('active');
+    }
+    
+    function markAllNotificationsRead() {
+        document.getElementById('notificationBadge').innerText = '0';
+        alert('All notifications marked as read');
+        closeNotificationsModal();
+    }
+    
+    function viewAnnouncements() {
+        openNotificationsModal();
+    }
+    
+    function viewAllAnnouncements() {
+        openNotificationsModal();
+    }
+    
+    function viewAllActivity() {
+        alert('📋 Recent Activity\n\nCheck your profile for complete activity history.');
+    }
+    
+    // ============================================
+    // Initialize
+    // ============================================
+    
+    function initSidebarClose() {
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.querySelector('.menu-toggle');
+            if (window.innerWidth <= 1024 && sidebar?.classList.contains('open')) {
+                if (!sidebar.contains(event.target) && !menuToggle?.contains(event.target)) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+    }
+    
+    function initNavigation() {
+        document.querySelectorAll('.menu-item[data-page]').forEach(item => {
+            const page = item.dataset.page;
+            if (page && page !== 'logout') {
+                item.addEventListener('click', () => navigateToPage(page));
+            }
+        });
+        
+        document.getElementById('logoutBtn').addEventListener('click', () => logout());
+    }
+    
+    window.onclick = function(event) {
+        const composeModal = document.getElementById('composeModal');
+        const notifModal = document.getElementById('notificationsModal');
+        if (event.target === composeModal) closeComposeModal();
+        if (event.target === notifModal) closeNotificationsModal();
+    }
+    
+    async function init() {
+        if (!checkAuth()) return;
+        
+        loadUserInfo();
+        initNavigation();
+        initSidebarClose();
+        checkNoticeStatus();
+        
+        await loadDashboardData();
+        await loadRecentMessages();
+        await loadRecentAnnouncements();
+        await loadLatestAnnouncement();
+        await loadNotifications();
+    }
+    
+    // Make functions global
+    window.toggleSidebar = toggleSidebar;
+    window.navigateToPage = navigateToPage;
+    window.logout = logout;
+    window.openComposeModal = openComposeModal;
+    window.closeComposeModal = closeComposeModal;
+    window.sendMessage = sendMessage;
+    window.openNotificationsModal = openNotificationsModal;
+    window.closeNotificationsModal = closeNotificationsModal;
+    window.markAllNotificationsRead = markAllNotificationsRead;
+    window.viewAnnouncements = viewAnnouncements;
+    window.viewAllAnnouncements = viewAllAnnouncements;
+    window.viewAllActivity = viewAllActivity;
+    window.dismissNotice = dismissNotice;
+    
+    init();
+</script>
+
+<style>
+    .upgrade-card {
+        background: white;
+        border-radius: var(--radius-xl);
+        padding: 20px;
+        margin-top: 30px;
+        text-align: center;
+    }
+    .upgrade-card h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .upgrade-card p {
+        font-size: 0.7rem;
+        color: var(--gray);
+        margin-bottom: 12px;
+    }
+    .upgrade-card img {
+        width: 100px;
+        margin-top: 12px;
+    }
+    .badge-unread {
+        display: inline-block;
+        background: var(--primary);
+        color: white;
+        font-size: 0.7rem;
+        padding: 2px 6px;
+        border-radius: 20px;
+    }
+    .menu-item {
+        cursor: pointer;
+    }
+    .notification {
+        cursor: pointer;
+    }
+    .loading-spinner {
+        width: 30px;
+        height: 30px;
+        border: 3px solid var(--border);
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 10px;
+    }
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+</style>
+
+</body>
+</html>

@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Messages - Edunova Smart Learning</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .messages-container {
+            display: flex;
+            gap: 25px;
+            min-height: 600px;
+        }
+        
+        .messages-sidebar {
+            width: 300px;
+            background: white;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        .messages-list {
+            flex: 1;
+            background: white;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .message-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .message-item:hover {
+            background: #f8f7fc;
+        }
+        
+        .message-item.unread {
+            background: #f0ebff;
+        }
+        
+        .message-item.active {
+            background: #e8e0ff;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .message-subject {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .message-preview {
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .message-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--gray);
+        }
+        
+        .message-viewer {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+        }
+        
+        .message-header {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .message-subject-large {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .message-details {
+            font-size: 0.75rem;
+            color: var(--gray);
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .message-body {
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        
+        .reply-box {
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        
+        .reply-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            resize: vertical;
+            font-family: inherit;
+            margin-bottom: 12px;
+        }
+        
+        .compose-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        
+        .nav-tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .nav-tab.active {
+            background: #f0ebff;
+            border-left-color: var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .badge-unread {
+            background: var(--primary);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-left: 8px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-xl);
+            width: 90%;
+            max-width: 500px;
+            padding: 25px;
+        }
+        
+        @media (max-width: 768px) {
+            .messages-container {
+                flex-direction: column;
+            }
+            .messages-sidebar {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <aside class="sidebar" id="sidebar">
+        <div>
+            <div class="sidebar-header">
+                <i class="fas fa-graduation-cap"></i>
+                <h2>Edunova<br><span>Smart Learning</span></h2>
+            </div>
+            <nav class="sidebar-menu">
+                <div class="menu-item" data-page="dashboard"><i class="fas fa-house"></i> Dashboard</div>
+                <div class="menu-item" data-page="courses"><i class="fas fa-book-open"></i> My Courses</div>
+                <div class="menu-item active" data-page="messages"><i class="fas fa-envelope"></i> Messages</div>
+                <div class="menu-item" data-page="profile"><i class="fas fa-user"></i> Profile</div>
+                <div class="menu-item" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</div>
+            </nav>
+        </div>
+        <div class="upgrade-card">
+            <h3>Stay Connected</h3>
+            <p>Check your messages for updates from instructors and admins.</p>
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135755.png" alt="">
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></div>
+                <div class="search-bar"><input type="text" placeholder="Search messages..."><i class="fas fa-search"></i></div>
+            </div>
+            <div class="topbar-right">
+                <div class="notification" onclick="showNotifications()"><i class="fas fa-bell"></i><span class="notification-badge" id="notifBadge">0</span></div>
+                <div class="profile" onclick="window.location.href='profile.html'">
+                    <img src="../../uploads/profiles/default.jpg" class="profile-img" id="profileImg">
+                    <div class="profile-info"><h4 id="userName">Loading...</h4><p>Student</p></div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <div class="page-header">
+                <h1>Messages</h1>
+                <p>Communicate with instructors and admins</p>
+            </div>
+
+            <div class="messages-container">
+                <div class="messages-sidebar">
+                    <button class="compose-btn" onclick="openComposeModal()"><i class="fas fa-plus"></i> New Message</button>
+                    <div class="nav-tab active" data-tab="inbox">Inbox <span id="inboxCount" class="badge-unread" style="display: none;">0</span></div>
+                    <div class="nav-tab" data-tab="sent">Sent</div>
+                    <div class="nav-tab" data-tab="archived">Archived</div>
+                    <div class="nav-tab" data-tab="announcements">Announcements <span id="announcementCount" class="badge-unread" style="display: none;">0</span></div>
+                </div>
+
+                <div class="messages-list">
+                    <div id="messagesList" class="messages-list-scroll" style="overflow-y: auto; flex: 1;"></div>
+                    <div id="messageViewer" class="message-viewer" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Compose Message Modal -->
+<div class="modal" id="composeModal">
+    <div class="modal-content">
+        <h3>New Message</h3>
+        <div class="form-group">
+            <label>To:</label>
+            <select id="recipientSelect" class="form-input">
+                <option value="">Select recipient...</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Subject:</label>
+            <input type="text" id="messageSubject" class="form-input" placeholder="Enter subject">
+        </div>
+        <div class="form-group">
+            <label>Message:</label>
+            <textarea id="messageContent" rows="5" class="form-textarea" placeholder="Type your message here..."></textarea>
+        </div>
+        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+            <button class="btn btn-outline" onclick="closeComposeModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="sendMessage()">Send Message</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_BASE = 'http://localhost/edunova/api';
+    let currentTab = 'inbox';
+    let currentMessage = null;
+    
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+    
+    function showNotifications() {
+        loadNotifications();
+        alert('🔔 Notifications\n\nYou have new messages and announcements');
+    }
+    
+    async function loadMessages() {
+        const token = localStorage.getItem('edunova_token');
+        if (!token) { window.location.href = 'login.html'; return; }
+        
+        try {
+            const response = await fetch(`${API_BASE}/students/get_messages.php?type=${currentTab}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                displayMessagesList(data.messages);
+                if (currentTab === 'inbox') {
+                    document.getElementById('inboxCount').style.display = data.unread_count > 0 ? 'inline-block' : 'none';
+                    document.getElementById('inboxCount').innerText = data.unread_count;
+                }
+            }
+        } catch (error) {
+            console.error('Error loading messages:', error);
+        }
+    }
+    
+    function displayMessagesList(messages) {
+        const container = document.getElementById('messagesList');
+        const viewer = document.getElementById('messageViewer');
+        
+        if (!messages || messages.length === 0) {
+            container.innerHTML = '<div class="empty-state" style="padding: 40px; text-align: center;"><i class="fas fa-inbox"></i><p>No messages found</p></div>';
+            viewer.style.display = 'none';
+            return;
+        }
+        
+        container.innerHTML = messages.map(msg => `
+            <div class="message-item ${!msg.is_read && currentTab === 'inbox' ? 'unread' : ''}" onclick="viewMessage(${msg.id})">
+                <div class="message-subject">${escapeHtml(msg.subject)}</div>
+                <div class="message-preview">${escapeHtml(msg.message.substring(0, 80))}${msg.message.length > 80 ? '...' : ''}</div>
+                <div class="message-meta">
+                    <span>${currentTab === 'sent' ? 'To: ' + (msg.receiver_name || 'Unknown') : 'From: ' + (msg.sender_name || 'Unknown')}</span>
+                    <span>${new Date(msg.created_at).toLocaleDateString()}</span>
+                </div>
+            </div>
+        `).join('');
+        
+        viewer.style.display = 'none';
+    }
+    
+    async function viewMessage(messageId) {
+        const token = localStorage.getItem('edunova_token');
+        
+        try {
+            const response = await fetch(`${API_BASE}/students/get_messages.php?type=${currentTab}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            const message = data.messages.find(m => m.id === messageId);
+            
+            if (message) {
+                currentMessage = message;
+                displayMessageViewer(message);
+            }
+        } catch (error) {
+            console.error('Error viewing message:', error);
+        }
+    }
+    
+    function displayMessageViewer(message) {
+        const container = document.getElementById('messageViewer');
+        const listContainer = document.getElementById('messagesList');
+        
+        container.style.display = 'block';
+        listContainer.style.display = 'none';
+        
+        const isFromAdmin = message.sender_role === 'admin';
+        
+        container.innerHTML = `
+            <button class="btn btn-outline btn-sm" onclick="backToMessages()" style="margin-bottom: 15px;"><i class="fas fa-arrow-left"></i> Back</button>
+            <div class="message-header">
+                <div class="message-subject-large">${escapeHtml(message.subject)}</div>
+                <div class="message-details">
+                    <span><i class="fas fa-user"></i> From: ${escapeHtml(message.sender_name)} (${message.sender_role})</span>
+                    <span><i class="far fa-clock"></i> ${new Date(message.created_at).toLocaleString()}</span>
+                </div>
+            </div>
+            <div class="message-body">
+                <p>${escapeHtml(message.message).replace(/\n/g, '<br>')}</p>
+            </div>
+            ${isFromAdmin ? `
+            <div class="reply-box">
+                <h4>Reply to Admin</h4>
+                <textarea id="replyMessage" class="reply-textarea" rows="4" placeholder="Type your reply here..."></textarea>
+                <button class="btn btn-primary" onclick="sendReply(${message.id})"><i class="fas fa-reply"></i> Send Reply</button>
+            </div>
+            ` : ''}
+        `;
+    }
+    
+    function backToMessages() {
+        document.getElementById('messageViewer').style.display = 'none';
+        document.getElementById('messagesList').style.display = 'block';
+        loadMessages();
+    }
+    
+    async function sendReply(parentId) {
+        const replyText = document.getElementById('replyMessage').value;
+        if (!replyText) { alert('Please enter a reply'); return; }
+        
+        const token = localStorage.getItem('edunova_token');
+        
+        try {
+            const response = await fetch(`${API_BASE}/students/reply_message.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ parent_message_id: parentId, message: replyText })
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('Reply sent successfully!');
+                backToMessages();
+            } else {
+                alert(data.error || 'Failed to send reply');
+            }
+        } catch (error) {
+            alert('Network error. Please try again.');
+        }
+    }
+    
+    async function loadAnnouncements() {
+        const token = localStorage.getItem('edunova_token');
+        
+        try {
+            const response = await fetch(`${API_BASE}/students/get_announcements.php`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                displayAnnouncements(data.announcements);
+                document.getElementById('announcementCount').style.display = data.unread_count > 0 ? 'inline-block' : 'none';
+                document.getElementById('announcementCount').innerText = data.unread_count;
+            }
+        } catch (error) {
+            console.error('Error loading announcements:', error);
+        }
+    }
+    
+    function displayAnnouncements(announcements) {
+        const container = document.getElementById('messagesList');
+        const viewer = document.getElementById('messageViewer');
+        
+        if (!announcements || announcements.length === 0) {
+            container.innerHTML = '<div class="empty-state" style="padding: 40px; text-align: center;"><i class="fas fa-bullhorn"></i><p>No announcements yet</p></div>';
+            viewer.style.display = 'none';
+            return;
+        }
+        
+        container.innerHTML = announcements.map(ann => `
+            <div class="message-item" onclick="viewAnnouncement(${ann.id})">
+                <div class="message-subject"><i class="fas fa-bullhorn"></i> ${escapeHtml(ann.title)}</div>
+                <div class="message-preview">${escapeHtml(ann.content.substring(0, 100))}${ann.content.length > 100 ? '...' : ''}</div>
+                <div class="message-meta">
+                    <span>From: ${escapeHtml(ann.sender_name)}</span>
+                    <span>${new Date(ann.created_at).toLocaleDateString()}</span>
+                </div>
+            </div>
+        `).join('');
+        
+        viewer.style.display = 'none';
+    }
+    
+    async function viewAnnouncement(announcementId) {
+        const token = localStorage.getItem('edunova_token');
+        
+        // Mark as read
+        await fetch(`${API_BASE}/students/mark_announcement_read.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ announcement_id: announcementId })
+        });
+        
+        // Reload to update count
+        loadAnnouncements();
+    }
+    
+    async function loadRecipients() {
+        // For demo, show list of admins/instructors
+        const select = document.getElementById('recipientSelect');
+        select.innerHTML = '<option value="">Select recipient...</option><option value="1">Admin User (admin)</option>';
+    }
+    
+    async function sendMessage() {
+        const recipientId = document.getElementById('recipientSelect').value;
+        const subject = document.getElementById('messageSubject').value;
+        const message = document.getElementById('messageContent').value;
+        
+        if (!recipientId || !subject || !message) {
+            alert('Please fill in all fields');
+            return;
+        }
+        
+        const token = localStorage.getItem('edunova_token');
+        
+        try {
+            const response = await fetch(`${API_BASE}/students/send_message.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ receiver_id: recipientId, subject: subject, message: message })
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('Message sent successfully!');
+                closeComposeModal();
+                loadMessages();
+            } else {
+                alert(data.error || 'Failed to send message');
+            }
+        } catch (error) {
+            alert('Network error. Please try again.');
+        }
+    }
+    
+    async function loadNotifications() {
+        const token = localStorage.getItem('edunova_token');
+        
+        try {
+            const response = await fetch(`${API_BASE}/students/get_notifications.php`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                document.getElementById('notifBadge').innerText = data.unread_count;
+            }
+        } catch (error) {
+            console.error('Error loading notifications:', error);
+        }
+    }
+    
+    function openComposeModal() {
+        loadRecipients();
+        document.getElementById('composeModal').classList.add('active');
+    }
+    
+    function closeComposeModal() {
+        document.getElementById('composeModal').classList.remove('active');
+        document.getElementById('messageSubject').value = '';
+        document.getElementById('messageContent').value = '';
+    }
+    
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    // Navigation
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentTab = tab.dataset.tab;
+            
+            if (currentTab === 'announcements') {
+                loadAnnouncements();
+            } else {
+                loadMessages();
+            }
+        });
+    });
+    
+    document.querySelectorAll('.menu-item[data-page]').forEach(item => {
+        item.addEventListener('click', () => {
+            const page = item.dataset.page;
+            if (page === 'dashboard') window.location.href = 'dashboard.html';
+            else if (page === 'courses') window.location.href = 'courses.html';
+            else if (page === 'profile') window.location.href = 'profile.html';
+        });
+    });
+    
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.removeItem('edunova_token');
+        localStorage.removeItem('edunova_user');
+        window.location.href = 'login.html';
+    });
+    
+    function loadUserInfo() {
+        const user = JSON.parse(localStorage.getItem('edunova_user') || '{}');
+        if (user.name) document.getElementById('userName').innerText = user.name;
+        if (user.profile_image) document.getElementById('profileImg').src = '../../' + user.profile_image;
+    }
+    
+    loadUserInfo();
+    loadMessages();
+    loadNotifications();
+    
+    window.toggleSidebar = toggleSidebar;
+    window.viewMessage = viewMessage;
+    window.backToMessages = backToMessages;
+    window.sendReply = sendReply;
+    window.openComposeModal = openComposeModal;
+    window.closeComposeModal = closeComposeModal;
+    window.sendMessage = sendMessage;
+</script>
+
+<style>
+    .messages-list-scroll::-webkit-scrollbar { width: 4px; }
+    .messages-list-scroll::-webkit-scrollbar-track { background: var(--border); border-radius: 10px; }
+    .messages-list-scroll::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+    .badge-unread { display: inline-block; background: var(--primary); color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 20px; margin-left: 8px; }
+</style>
+
+</body>
+</html>

@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edunova - Smart Learning Register</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #1a0f5e 0%, #2d1b8a 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .register-container {
+      max-width: 1200px;
+      width: 100%;
+      background: white;
+      border-radius: 30px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    /* LEFT SIDE - Illustration */
+    .register-illustration {
+      flex: 1;
+      background: linear-gradient(135deg, #f5f1ff 0%, #f8f2ff 100%);
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      min-height: 500px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    .logo-icon {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #6D3BFF, #4B22E8);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+    }
+
+    .logo-text {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .logo-text span:first-child {
+      color: #5B34F2;
+    }
+
+    .welcome-text h1 {
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .welcome-text h1 span {
+      color: #5B34F2;
+    }
+
+    .welcome-text p {
+      color: #5D647B;
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 40px;
+      max-width: 400px;
+    }
+
+    /* Laptop Illustration */
+    .laptop-mockup {
+      position: relative;
+      margin-top: 40px;
+    }
+
+    .laptop-screen {
+      background: #0F172A;
+      border-radius: 12px 12px 0 0;
+      padding: 15px;
+      width: 100%;
+      max-width: 450px;
+      margin: 0 auto;
+    }
+
+    .laptop-screen-inner {
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
+      min-height: 200px;
+    }
+
+    .laptop-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .laptop-header h4 {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .laptop-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .stat-box {
+      background: #F7F8FC;
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .stat-box .number {
+      font-size: 24px;
+      font-weight: 700;
+      color: #5B34F2;
+    }
+
+    .stat-box .label {
+      font-size: 9px;
+      color: #8D95A8;
+    }
+
+    .progress-section {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .progress-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 6px solid #EAE5FF;
+      border-top-color: #6B3CFF;
+      transform: rotate(45deg);
+    }
+
+    .progress-text p {
+      font-size: 11px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .progress-text small {
+      font-size: 9px;
+      color: #8D95A8;
+    }
+
+    .laptop-base {
+      width: 80%;
+      height: 8px;
+      background: #D6D8E0;
+      border-radius: 0 0 20px 20px;
+      margin: 0 auto;
+    }
+
+    /* RIGHT SIDE - Register Form */
+    .register-form {
+      flex: 1;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .form-icon {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .form-icon .icon-circle {
+      width: 80px;
+      height: 80px;
+      background: #F0EAFF;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+    }
+
+    .form-icon i {
+      font-size: 36px;
+      color: #5B34F2;
+    }
+
+    .form-title {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .form-title h2 {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .form-title p {
+      color: #61687D;
+      font-size: 14px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    .input-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-wrapper i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6C7388;
+      font-size: 14px;
+    }
+
+    .input-wrapper input,
+    .input-wrapper select {
+      width: 100%;
+      padding: 12px 12px 12px 38px;
+      border: 1px solid #DDE1EB;
+      border-radius: 10px;
+      font-size: 14px;
+      transition: all 0.3s;
+      background: white;
+    }
+
+    .input-wrapper input:focus,
+    .input-wrapper select:focus {
+      border-color: #5B34F2;
+      outline: none;
+    }
+
+    .terms {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 20px 0;
+      font-size: 13px;
+      flex-wrap: wrap;
+    }
+
+    .terms input {
+      width: 16px;
+      height: 16px;
+    }
+
+    .terms a {
+      color: #5B34F2;
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .register-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #6D3BFF, #4B22E8);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .register-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #525B71;
+    }
+
+    .login-link a {
+      color: #5B34F2;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .error-message {
+      background: #fee2e2;
+      color: #ef4444;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 13px;
+      display: none;
+    }
+
+    .success-message {
+      background: #dcfce7;
+      color: #22c55e;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 13px;
+      display: none;
+    }
+
+    /* MODAL STYLES */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 24px;
+      width: 90%;
+      max-width: 700px;
+      max-height: 85vh;
+      overflow-y: auto;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-header {
+      padding: 20px 25px;
+      background: linear-gradient(135deg, #6D3BFF, #4B22E8);
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .modal-header h3 {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .close-modal {
+      font-size: 28px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .close-modal:hover {
+      transform: scale(1.1);
+    }
+
+    .modal-body {
+      padding: 25px;
+    }
+
+    .modal-body h4 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      color: #1a1a2e;
+    }
+
+    .modal-body h4:first-child {
+      margin-top: 0;
+    }
+
+    .modal-body p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #4a5568;
+      margin-bottom: 15px;
+    }
+
+    .modal-body ul {
+      margin-left: 20px;
+      margin-bottom: 15px;
+    }
+
+    .modal-body li {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #4a5568;
+      margin-bottom: 8px;
+    }
+
+    .modal-footer {
+      padding: 15px 25px;
+      border-top: 1px solid #E5E7EB;
+      display: flex;
+      justify-content: flex-end;
+      position: sticky;
+      bottom: 0;
+      background: white;
+    }
+
+    .modal-footer button {
+      padding: 10px 25px;
+      background: linear-gradient(135deg, #6D3BFF, #4B22E8);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .modal-footer button:hover {
+      transform: translateY(-2px);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .register-container {
+        flex-direction: column;
+      }
+      .register-illustration {
+        display: none;
+      }
+      .register-form {
+        padding: 25px;
+        max-height: none;
+      }
+      .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+      .form-title h2 {
+        font-size: 24px;
+      }
+      .modal-content {
+        width: 95%;
+        margin: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="register-container">
+  <!-- LEFT SIDE - Illustration -->
+  <div class="register-illustration">
+    <div class="logo">
+      <div class="logo-icon">
+        <i class="fas fa-graduation-cap"></i>
+      </div>
+      <div class="logo-text">
+        <span>Edunova</span> - Smart Learning
+      </div>
+    </div>
+
+    <div class="welcome-text">
+      <h1>Join <span>Us!</span></h1>
+      <p>Create your account and start your learning journey today.</p>
+    </div>
+
+    <!-- Laptop Illustration -->
+    <div class="laptop-mockup">
+      <div class="laptop-screen">
+        <div class="laptop-screen-inner">
+          <div class="laptop-header">
+            <h4>Hello, Student!</h4>
+            <div class="w-[18px] h-[18px] rounded-full bg-[#D7E1FF]"></div>
+          </div>
+          <div class="laptop-stats">
+            <div class="stat-box">
+              <div class="number">12</div>
+              <div class="label">Courses Enrolled</div>
+            </div>
+            <div class="stat-box">
+              <div class="number">08</div>
+              <div class="label">Courses Taken</div>
+            </div>
+            <div class="stat-box">
+              <div class="number">05</div>
+              <div class="label">Certificates</div>
+            </div>
+          </div>
+          <div class="progress-section">
+            <div class="progress-circle"></div>
+            <div class="progress-text">
+              <p>You are doing great!</p>
+              <small>Keep it up and achieve more.</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="laptop-base"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDE - Register Form -->
+  <div class="register-form">
+    <div class="form-icon">
+      <div class="icon-circle">
+        <i class="fas fa-user-plus"></i>
+      </div>
+    </div>
+
+    <div class="form-title">
+      <h2>Create Account</h2>
+      <p>Fill in the details to create your account</p>
+    </div>
+
+    <div id="errorMessage" class="error-message"></div>
+    <div id="successMessage" class="success-message"></div>
+
+    <div class="form-row">
+      <div class="input-group">
+        <label>Full Name *</label>
+        <div class="input-wrapper">
+          <i class="fas fa-user"></i>
+          <input type="text" id="fullName" placeholder="Enter your full name">
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Username *</label>
+        <div class="input-wrapper">
+          <i class="fas fa-at"></i>
+          <input type="text" id="username" placeholder="Choose a username">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="input-group">
+        <label>Email Address *</label>
+        <div class="input-wrapper">
+          <i class="fas fa-envelope"></i>
+          <input type="email" id="email" placeholder="Enter your email">
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Phone Number</label>
+        <div class="input-wrapper">
+          <i class="fas fa-phone"></i>
+          <input type="tel" id="phone" placeholder="Enter your phone">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="input-group">
+        <label>Password *</label>
+        <div class="input-wrapper">
+          <i class="fas fa-lock"></i>
+          <input type="password" id="password" placeholder="Create a password">
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Confirm Password *</label>
+        <div class="input-wrapper">
+          <i class="fas fa-lock"></i>
+          <input type="password" id="confirmPassword" placeholder="Confirm your password">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="input-group">
+        <label>Date of Birth</label>
+        <div class="input-wrapper">
+          <i class="fas fa-calendar"></i>
+          <input type="date" id="dob">
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Gender</label>
+        <div class="input-wrapper">
+          <i class="fas fa-venus-mars"></i>
+          <select id="gender">
+            <option value="">Select</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="terms">
+      <input type="checkbox" id="termsCheckbox">
+      <label>I agree to the <a href="#" onclick="openTermsModal(); return false;">Terms & Conditions</a> and <a href="#" onclick="openPrivacyModal(); return false;">Privacy Policy</a></label>
+    </div>
+
+    <button class="register-btn" id="registerBtn" onclick="handleRegister()">
+      <i class="fas fa-user-plus"></i> Create Account
+    </button>
+
+    <div class="login-link">
+      Already have an account? <a href="login.html">Login here</a>
+    </div>
+  </div>
+</div>
+
+<!-- Terms & Conditions Modal -->
+<div class="modal" id="termsModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Terms & Conditions</h3>
+      <span class="close-modal" onclick="closeTermsModal()">&times;</span>
+    </div>
+    <div class="modal-body">
+      <h4>1. Acceptance of Terms</h4>
+      <p>By accessing and using Edunova - Smart Learning Platform, you agree to be bound by these Terms & Conditions. If you do not agree to these terms, please do not use our platform.</p>
+      
+      <h4>2. User Accounts</h4>
+      <p>To access certain features of the platform, you must create a user account. You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.</p>
+      
+      <h4>3. Course Enrollment and Access</h4>
+      <p>Upon enrollment in a course, you will be granted access to the course materials for a period determined by the course duration. Course access is for your personal, non-commercial use only.</p>
+      
+      <h4>4. User Conduct</h4>
+      <p>You agree to use the platform in a manner consistent with all applicable laws and regulations. You shall not:</p>
+      <ul>
+        <li>Share your account credentials with others</li>
+        <li>Copy, distribute, or modify course materials without permission</li>
+        <li>Harass, threaten, or impersonate other users</li>
+        <li>Post inappropriate or offensive content</li>
+      </ul>
+      
+      <h4>5. Intellectual Property</h4>
+      <p>All course content, including videos, text, images, and quizzes, are the intellectual property of Edunova or its licensors. You may not reproduce, distribute, or create derivative works without explicit permission.</p>
+      
+      <h4>6. Payments and Refunds</h4>
+      <p>Course fees are as displayed at the time of enrollment. Refunds may be requested within 7 days of purchase if less than 20% of the course has been completed.</p>
+      
+      <h4>7. Certificates of Completion</h4>
+      <p>Certificates are issued upon successful completion of all course requirements. Edunova reserves the right to verify completion before issuing certificates.</p>
+      
+      <h4>8. Termination</h4>
+      <p>Edunova reserves the right to suspend or terminate your account for violation of these terms or for any other reason at our sole discretion.</p>
+      
+      <h4>9. Limitation of Liability</h4>
+      <p>Edunova shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the platform.</p>
+      
+      <h4>10. Changes to Terms</h4>
+      <p>We may modify these terms at any time. Continued use of the platform constitutes acceptance of the modified terms.</p>
+      
+      <h4>11. Governing Law</h4>
+      <p>These terms shall be governed by and construed in accordance with the laws of Nigeria.</p>
+      
+      <h4>12. Contact Information</h4>
+      <p>For questions about these Terms & Conditions, please contact us at: legal@edunova.com</p>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closeTermsModal()">I Understand</button>
+    </div>
+  </div>
+</div>
+
+<!-- Privacy Policy Modal -->
+<div class="modal" id="privacyModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Privacy Policy</h3>
+      <span class="close-modal" onclick="closePrivacyModal()">&times;</span>
+    </div>
+    <div class="modal-body">
+      <h4>1. Information We Collect</h4>
+      <p>We collect information you provide directly to us, such as when you create an account, enroll in courses, or contact us for support. This may include:</p>
+      <ul>
+        <li>Name, email address, and username</li>
+        <li>Phone number and date of birth</li>
+        <li>Course enrollment and progress data</li>
+        <li>Quiz and assessment results</li>
+        <li>Communications with us</li>
+      </ul>
+      
+      <h4>2. How We Use Your Information</h4>
+      <p>We use the information we collect to:</p>
+      <ul>
+        <li>Provide, maintain, and improve our services</li>
+        <li>Process your course enrollments</li>
+        <li>Track your learning progress</li>
+        <li>Send you important updates and notifications</li>
+        <li>Respond to your inquiries and support requests</li>
+        <li>Generate certificates upon course completion</li>
+      </ul>
+      
+      <h4>3. Information Sharing</h4>
+      <p>We do not sell, trade, or rent your personal information to third parties. We may share information in the following circumstances:</p>
+      <ul>
+        <li>With your consent</li>
+        <li>To comply with legal obligations</li>
+        <li>To protect the rights and safety of Edunova and our users</li>
+        <li>With service providers who assist in our operations</li>
+      </ul>
+      
+      <h4>4. Data Security</h4>
+      <p>We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. Your password is encrypted and never stored in plain text.</p>
+      
+      <h4>5. Cookies and Tracking</h4>
+      <p>We use cookies and similar tracking technologies to enhance your experience, analyze usage, and personalize content. You can control cookie settings through your browser preferences.</p>
+      
+      <h4>6. Third-Party Links</h4>
+      <p>Our platform may contain links to third-party websites. We are not responsible for the privacy practices of these external sites.</p>
+      
+      <h4>7. Children's Privacy</h4>
+      <p>Edunova is not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13.</p>
+      
+      <h4>8. Your Rights</h4>
+      <p>Depending on your location, you may have the right to:</p>
+      <ul>
+        <li>Access your personal information</li>
+        <li>Correct inaccurate information</li>
+        <li>Request deletion of your information</li>
+        <li>Object to certain processing activities</li>
+        <li>Data portability</li>
+      </ul>
+      
+      <h4>9. Data Retention</h4>
+      <p>We retain your personal information for as long as your account is active or as needed to provide you with services. You may delete your account at any time.</p>
+      
+      <h4>10. Changes to Privacy Policy</h4>
+      <p>We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the new policy on this page.</p>
+      
+      <h4>11. Contact Us</h4>
+      <p>If you have questions about this Privacy Policy or our data practices, please contact us at:</p>
+      <p><strong>Email:</strong> privacy@edunova.com</p>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closePrivacyModal()">I Understand</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ============================================
+  // FIXED API PATH - CORRECT FOR XAMPP
+  // ============================================
+  
+  const API_BASE = 'http://localhost/edunova/api';
+  
+  console.log('API Base URL:', API_BASE);
+  
+  // ============================================
+  // MODAL FUNCTIONS
+  // ============================================
+  
+  function openTermsModal() {
+    document.getElementById('termsModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  
+  function closeTermsModal() {
+    document.getElementById('termsModal').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+  
+  function openPrivacyModal() {
+    document.getElementById('privacyModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  
+  function closePrivacyModal() {
+    document.getElementById('privacyModal').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+  
+  // Close modals when clicking outside
+  window.onclick = function(event) {
+    const termsModal = document.getElementById('termsModal');
+    const privacyModal = document.getElementById('privacyModal');
+    
+    if (event.target === termsModal) {
+      closeTermsModal();
+    }
+    if (event.target === privacyModal) {
+      closePrivacyModal();
+    }
+  }
+  
+  // ============================================
+  // TEST CONNECTION
+  // ============================================
+  
+  async function testConnection() {
+    try {
+      const response = await fetch('http://localhost/edunova/api/test.php');
+      const data = await response.json();
+      console.log('✅ API Connection Test Successful:', data);
+      return true;
+    } catch (error) {
+      console.error('❌ API Connection Failed:', error);
+      const errorDiv = document.getElementById('errorMessage');
+      errorDiv.textContent = '⚠️ Cannot connect to server. Please make sure XAMPP is running.';
+      errorDiv.style.display = 'block';
+      return false;
+    }
+  }
+  
+  // ============================================
+  // REGISTER FUNCTION
+  // ============================================
+  
+  async function handleRegister() {
+    const fullName = document.getElementById('fullName').value;
+    const username = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const dob = document.getElementById('dob').value;
+    const gender = document.getElementById('gender').value;
+    const termsAccepted = document.getElementById('termsCheckbox').checked;
+    
+    const errorDiv = document.getElementById('errorMessage');
+    const successDiv = document.getElementById('successMessage');
+    const registerBtn = document.getElementById('registerBtn');
+    
+    // Reset messages
+    errorDiv.style.display = 'none';
+    successDiv.style.display = 'none';
+    
+    // Validation
+    if (!fullName || !username || !email || !password || !confirmPassword) {
+      errorDiv.textContent = 'Please fill in all required fields';
+      errorDiv.style.display = 'block';
+      return;
+    }
+    
+    if (password !== confirmPassword) {
+      errorDiv.textContent = 'Passwords do not match';
+      errorDiv.style.display = 'block';
+      return;
+    }
+    
+    if (password.length < 6) {
+      errorDiv.textContent = 'Password must be at least 6 characters';
+      errorDiv.style.display = 'block';
+      return;
+    }
+    
+    if (!termsAccepted) {
+      errorDiv.textContent = 'Please accept the Terms & Conditions';
+      errorDiv.style.display = 'block';
+      return;
+    }
+    
+    // Disable button
+    registerBtn.disabled = true;
+    registerBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Creating Account...';
+    
+    try {
+      const url = `${API_BASE}/auth/register.php`;
+      console.log('📤 Sending request to:', url);
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          full_name: fullName,
+          username: username,
+          email: email,
+          phone: phone,
+          password: password,
+          confirm_password: confirmPassword,
+          date_of_birth: dob,
+          gender: gender
+        })
+      });
+      
+      const data = await response.json();
+      console.log('📥 Response:', data);
+      
+      if (response.ok && data.success) {
+        // Save to localStorage
+        localStorage.setItem('edunova_token', data.token);
+        localStorage.setItem('edunova_user', JSON.stringify(data.user));
+        
+        successDiv.textContent = '✅ Registration successful! Redirecting to dashboard...';
+        successDiv.style.display = 'block';
+        
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 2000);
+      } else {
+        errorDiv.textContent = data.error || 'Registration failed. Please try again.';
+        errorDiv.style.display = 'block';
+        registerBtn.disabled = false;
+        registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+      }
+    } catch (error) {
+      console.error('❌ Registration error:', error);
+      
+      let errorMessage = 'Unable to connect to server. ';
+      
+      if (!navigator.onLine) {
+        errorMessage += 'Please check your internet connection.';
+      } else {
+        errorMessage += 'Make sure XAMPP is running. Try: http://localhost/edunova/api/test.php';
+      }
+      
+      errorDiv.textContent = errorMessage;
+      errorDiv.style.display = 'block';
+      registerBtn.disabled = false;
+      registerBtn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+    }
+  }
+  
+  // Test connection when page loads
+  window.addEventListener('DOMContentLoaded', function() {
+    testConnection();
+  });
+  
+  // Enter key support
+  document.querySelectorAll('#password, #confirmPassword').forEach(input => {
+    input.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        handleRegister();
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

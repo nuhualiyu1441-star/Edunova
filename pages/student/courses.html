@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>My Courses - Edunova Smart Learning</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .page-header {
+            margin-bottom: 30px;
+        }
+        
+        .page-header h1 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        
+        .page-header p {
+            color: var(--gray);
+        }
+        
+        .filters-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-chip {
+            padding: 8px 20px;
+            border-radius: 50px;
+            border: 1px solid var(--border);
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .filter-chip:hover,
+        .filter-chip.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            background: white;
+            border-radius: var(--radius-xl);
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+        
+        .error-state {
+            text-align: center;
+            padding: 60px;
+            background: white;
+            border-radius: var(--radius-xl);
+        }
+        
+        .error-state i {
+            font-size: 4rem;
+            color: #ef4444;
+            margin-bottom: 20px;
+        }
+
+        /* Notice Box Styles */
+        .notice-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: var(--radius-lg);
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .notice-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+        
+        .notice-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f59e0b;
+            font-size: 1.25rem;
+        }
+        
+        .notice-text {
+            flex: 1;
+        }
+        
+        .notice-title {
+            font-weight: 700;
+            font-size: 0.875rem;
+            margin-bottom: 4px;
+        }
+        
+        .notice-message {
+            font-size: 0.75rem;
+            color: #92400e;
+        }
+        
+        .notice-close {
+            cursor: pointer;
+            color: #92400e;
+            font-size: 1rem;
+            padding: 5px;
+        }
+        
+        /* Announcement Banner */
+        .announcement-banner {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            border-radius: var(--radius-lg);
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .announcement-banner:hover {
+            transform: translateX(5px);
+        }
+        
+        .announcement-icon {
+            width: 35px;
+            height: 35px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .announcement-text {
+            flex: 1;
+        }
+        
+        .announcement-title {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .announcement-date {
+            font-size: 0.65rem;
+            color: #4338ca;
+        }
+        
+        /* Message Badge */
+        .message-badge {
+            position: relative;
+        }
+        
+        .unread-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ef4444;
+            color: white;
+            font-size: 0.625rem;
+            padding: 2px 5px;
+            border-radius: 10px;
+            min-width: 16px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .courses-grid {
+                grid-template-columns: 1fr;
+            }
+            .filters-bar {
+                justify-content: center;
+            }
+            .notice-box {
+                flex-direction: column;
+                text-align: center;
+            }
+            .notice-content {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div>
+            <div class="sidebar-header">
+                <i class="fas fa-graduation-cap"></i>
+                <h2>Edunova<br><span>Smart Learning</span></h2>
+            </div>
+            <nav class="sidebar-menu">
+                <div class="menu-item" data-page="dashboard">
+                    <i class="fas fa-house"></i> Dashboard
+                </div>
+                <div class="menu-item active" data-page="courses">
+                    <i class="fas fa-book-open"></i> My Courses
+                </div>
+                <div class="menu-item" data-page="quizzes">
+                    <i class="fas fa-question-circle"></i> Quizzes
+                </div>
+                <div class="menu-item" data-page="messages">
+                    <i class="fas fa-envelope message-badge"></i> Messages
+                    <span id="sidebarMessageBadge" class="unread-count" style="display: none;">0</span>
+                </div>
+                <div class="menu-item" data-page="profile">
+                    <i class="fas fa-user"></i> Profile
+                </div>
+                <div class="menu-item" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </div>
+            </nav>
+        </div>
+        <div class="upgrade-card">
+            <h3>Keep learning, keep growing! 🚀</h3>
+            <p>Explore new courses and upgrade your skills today.</p>
+            <button class="btn btn-primary" onclick="window.location.href='courses.html'">Explore More</button>
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135755.png" alt="Learning">
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="menu-toggle" onclick="window.toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Search your courses...">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="notification" onclick="openNotificationsModal()">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="notificationBadge">0</span>
+                </div>
+                <div class="profile" onclick="window.location.href='profile.html'">
+                    <img src="../../uploads/profiles/default.jpg" alt="Profile" class="profile-img" id="profileImg">
+                    <div class="profile-info">
+                        <h4 id="userName">Loading...</h4>
+                        <p>Student</p>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Notice Box -->
+            <div class="notice-box" id="noticeBox">
+                <div class="notice-content">
+                    <div class="notice-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div class="notice-text">
+                        <div class="notice-title">📢 Stay Updated!</div>
+                        <div class="notice-message" id="noticeMessage">New courses added weekly. Check back often for fresh content!</div>
+                    </div>
+                </div>
+                <div class="notice-close" onclick="dismissNotice()">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+
+            <!-- Announcement Banner -->
+            <div class="announcement-banner" id="announcementBanner" onclick="viewAnnouncements()" style="display: none;">
+                <div class="announcement-icon">
+                    <i class="fas fa-bullhorn"></i>
+                </div>
+                <div class="announcement-text">
+                    <div class="announcement-title" id="latestAnnouncementTitle">New Announcement</div>
+                    <div class="announcement-date" id="latestAnnouncementDate">Just now</div>
+                </div>
+                <i class="fas fa-chevron-right" style="color: #4338ca;"></i>
+            </div>
+
+            <div class="page-header">
+                <h1>My Courses</h1>
+                <p>Continue your learning journey with these courses</p>
+            </div>
+            
+            <!-- Filters -->
+            <div class="filters-bar">
+                <button class="filter-chip active" data-filter="all">All Courses</button>
+                <button class="filter-chip" data-filter="in-progress">In Progress</button>
+                <button class="filter-chip" data-filter="completed">Completed</button>
+                <button class="filter-chip" data-filter="not-started">Not Started</button>
+            </div>
+            
+            <!-- Courses Grid -->
+            <div class="courses-grid" id="coursesContainer">
+                <div class="loading"><div class="loading-spinner"></div><p>Loading your courses...</p></div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Notifications Modal -->
+<div class="modal" id="notificationsModal" style="display: none;">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <h3><i class="fas fa-bell"></i> Notifications</h3>
+            <span class="close-modal" onclick="closeNotificationsModal()">&times;</span>
+        </div>
+        <div id="notificationsList" style="max-height: 400px; overflow-y: auto;">
+            <div class="loading">Loading notifications...</div>
+        </div>
+        <div style="margin-top: 15px; text-align: center;">
+            <button class="btn btn-outline btn-sm" onclick="markAllNotificationsRead()">Mark All as Read</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============================================
+    // UPGRADED COURSES PAGE WITH NOTICE BOX
+    // ============================================
+    
+    let API_BASE = null;
+    let allCourses = [];
+    let currentFilter = 'all';
+    let unreadMessages = 0;
+    let unreadNotifications = 0;
+    let announcementInterval = null;
+    
+    // Notice messages rotation
+    const noticeMessages = [
+        "🎉 New courses added weekly! Check back often for fresh content!",
+        "📚 Complete 3 courses this month to earn a special certificate!",
+        "⭐ Rate your completed courses and help other students!",
+        "💬 Have questions? Contact our support team 24/7!",
+        "🚀 Pro tip: Use filters to find your in-progress courses faster!"
+    ];
+    let currentNoticeIndex = 0;
+    
+    // Try different possible ports
+    const possibleUrls = [
+        'http://localhost/edunova/api/test.php',
+        'http://localhost:80/edunova/api/test.php',
+        'http://localhost:8080/edunova/api/test.php',
+        'http://127.0.0.1/edunova/api/test.php',
+        'http://127.0.0.1:80/edunova/api/test.php',
+        'http://127.0.0.1:8080/edunova/api/test.php'
+    ];
+    
+    async function findWorkingApiBase() {
+        for (const testUrl of possibleUrls) {
+            try {
+                console.log(`🔍 Testing: ${testUrl}`);
+                const response = await fetch(testUrl, { 
+                    method: 'GET',
+                    mode: 'cors',
+                    cache: 'no-cache'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        const baseUrl = testUrl.replace('/test.php', '');
+                        console.log(`✅ Found working API at: ${baseUrl}`);
+                        return baseUrl;
+                    }
+                }
+            } catch (e) {
+                console.log(`❌ Failed: ${testUrl}`);
+            }
+        }
+        return null;
+    }
+    
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('open');
+    }
+    
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diff = now - date;
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        
+        if (days === 0) {
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            if (hours === 0) return 'Just now';
+            return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+        } else if (days === 1) {
+            return 'Yesterday';
+        } else if (days < 7) {
+            return `${days} days ago`;
+        } else {
+            return date.toLocaleDateString();
+        }
+    }
+    
+    // ============================================
+    // Notice Box Functions
+    // ============================================
+    
+    function rotateNoticeMessage() {
+        currentNoticeIndex = (currentNoticeIndex + 1) % noticeMessages.length;
+        const noticeMessage = document.getElementById('noticeMessage');
+        if (noticeMessage) {
+            noticeMessage.style.opacity = '0';
+            setTimeout(() => {
+                noticeMessage.innerText = noticeMessages[currentNoticeIndex];
+                noticeMessage.style.opacity = '1';
+            }, 300);
+        }
+    }
+    
+    function dismissNotice() {
+        document.getElementById('noticeBox').style.display = 'none';
+        localStorage.setItem('noticeDismissed', 'true');
+    }
+    
+    function checkNoticeStatus() {
+        const dismissed = localStorage.getItem('noticeDismissed');
+        if (dismissed === 'true') {
+            document.getElementById('noticeBox').style.display = 'none';
+        } else {
+            document.getElementById('noticeBox').style.display = 'flex';
+        }
+    }
+    
+    // ============================================
+    // Notifications Functions
+    // ============================================
+    
+    async function loadNotifications() {
+        const token = localStorage.getItem('edunova_token');
+        
+        try {
+            const response = await fetch(`${API_BASE}/students/get_notifications.php?limit=10`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                unreadNotifications = data.unread_count || 0;
+                const badge = document.getElementById('notificationBadge');
+                badge.innerText = unreadNotifications > 9 ? '9+' : unreadNotifications;
+                badge.style.display = unreadNotifications > 0 ? 'inline-flex' : 'none';
+            }
+        } catch (error) {
+            console.error('Error loading notifications:', error);
+        }
+    }
+    
+    async function loadUnreadMessages() {
+        const token = localStorage.getItem('edunova_token');
+        
+        try {
+            const response = await fetch(`${API_BASE}/students/get_messages.php?type=inbox`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                unreadMessages = data.unread_count || 0;
+                const badge = document.getElementById('sidebarMessageBadge');
+                if (unreadMessages > 0) {
+                    badge.style.display = 'inline-block';
+                    badge.innerText = unreadMessages > 9 ? '9+' : unreadMessages;
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        } catch (error) {
+            console.error('Error loading messages:', error);
+        }
+    }
+    
+    async function loadLatestAnnouncement() {
+        const token = localStorage.getItem('edunova_token');
+        
+        try {
+            const response = await fetch(`${API_BASE}/students/get_announcements.php?limit=1`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            
+            if (data.success && data.announcements && data.announcements.length > 0) {
+                const announcement = data.announcements[0];
+                const banner = document.getElementById('announcementBanner');
+                const titleEl = document.getElementById('latestAnnouncementTitle');
+                const dateEl = document.getElementById('latestAnnouncementDate');
+                
+                titleEl.innerText = announcement.title;
+                dateEl.innerText = formatDate(announcement.created_at);
+                banner.style.display = 'flex';
+            }
+        } catch (error) {
+            console.error('Error loading announcement:', error);
+        }
+    }
+    
+    function viewAnnouncements() {
+        openNotificationsModal();
+    }
+    
+    function openNotificationsModal() {
+        const modal = document.getElementById('notificationsModal');
+        modal.style.display = 'flex';
+        loadNotificationsList();
+    }
+    
+    function closeNotificationsModal() {
+        document.getElementById('notificationsModal').style.display = 'none';
+    }
+    
+    async function loadNotificationsList() {
+        const token = localStorage.getItem('edunova_token');
+        const container = document.getElementById('notificationsList');
+        
+        try {
+            const response = await fetch(`${API_BASE}/students/get_notifications.php?limit=20`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            
+            if (data.success && data.notifications && data.notifications.length > 0) {
+                container.innerHTML = data.notifications.map(notif => `
+                    <div class="activity-item" style="cursor: pointer;" onclick="markNotificationRead(${notif.id}, '${notif.link}')">
+                        <div class="activity-icon" style="background: #f0e6ff; color: #5b34ea;">
+                            <i class="fas ${notif.type === 'message' ? 'fa-envelope' : notif.type === 'announcement' ? 'fa-bullhorn' : 'fa-bell'}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">${escapeHtml(notif.title)}</div>
+                            <div class="activity-time">${formatDate(notif.created_at)}</div>
+                        </div>
+                        ${!notif.is_read ? '<div style="width: 8px; height: 8px; background: #5b34ea; border-radius: 50%;"></div>' : ''}
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<div class="empty-state"><p>No notifications</p></div>';
+            }
+        } catch (error) {
+            container.innerHTML = '<div class="empty-state"><p>Error loading notifications</p></div>';
+        }
+    }
+    
+    async function markNotificationRead(notificationId, link) {
+        const token = localStorage.getItem('edunova_token');
+        
+        await fetch(`${API_BASE}/students/mark_notification_read.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ notification_id: notificationId })
+        });
+        
+        closeNotificationsModal();
+        if (link) window.location.href = link;
+    }
+    
+    async function markAllNotificationsRead() {
+        const token = localStorage.getItem('edunova_token');
+        
+        await fetch(`${API_BASE}/students/mark_notification_read.php`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ mark_all: true })
+        });
+        
+        loadNotifications();
+        document.getElementById('notificationBadge').innerText = '0';
+        alert('All notifications marked as read');
+        closeNotificationsModal();
+    }
+    
+    // ============================================
+    // Course Loading Functions
+    // ============================================
+    
+    function showLoadingState() {
+        const container = document.getElementById('coursesContainer');
+        container.innerHTML = `<div class="loading"><div class="loading-spinner"></div><p>Loading your courses...</p></div>`;
+    }
+    
+    function showErrorState(message) {
+        const container = document.getElementById('coursesContainer');
+        container.innerHTML = `
+            <div class="error-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Unable to Load Courses</h3>
+                <p>${message}</p>
+                <button class="btn btn-primary" onclick="location.reload()">Try Again</button>
+            </div>
+        `;
+    }
+    
+    function showConnectionError() {
+        const container = document.getElementById('coursesContainer');
+        container.innerHTML = `
+            <div class="error-state">
+                <i class="fas fa-plug"></i>
+                <h3>Cannot Connect to Server</h3>
+                <p>Please make sure XAMPP is running.</p>
+                <button class="btn btn-primary" onclick="location.reload()">Try Again</button>
+            </div>
+        `;
+    }
+    
+    function showEmptyState() {
+        const container = document.getElementById('coursesContainer');
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-book-open"></i>
+                <h3>No courses enrolled yet</h3>
+                <p>Browse our course catalog to start learning</p>
+                <button class="btn btn-primary" onclick="window.location.href='../index.html'">Browse Courses</button>
+            </div>
+        `;
+    }
+    
+    async function loadCourses() {
+        const token = localStorage.getItem('edunova_token');
+        
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        if (!API_BASE) {
+            showConnectionError();
+            return;
+        }
+        
+        showLoadingState();
+        
+        try {
+            const url = `${API_BASE}/students/get_courses.php`;
+            console.log('📤 Fetching courses from:', url);
+            
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            const data = await response.json();
+            console.log('📥 Courses response:', data);
+            
+            if (response.ok && data.success) {
+                if (data.courses && data.courses.length > 0) {
+                    allCourses = data.courses;
+                    displayCourses();
+                } else {
+                    showEmptyState();
+                }
+            } else if (response.status === 401) {
+                localStorage.removeItem('edunova_token');
+                localStorage.removeItem('edunova_user');
+                window.location.href = 'login.html';
+            } else {
+                showErrorState(data.error || 'Failed to load courses');
+            }
+        } catch (error) {
+            console.error('❌ Error loading courses:', error);
+            showErrorState('Cannot connect to server. Please make sure XAMPP is running.');
+        }
+    }
+    
+    function displayCourses() {
+        const container = document.getElementById('coursesContainer');
+        let filtered = [...allCourses];
+        
+        switch(currentFilter) {
+            case 'in-progress':
+                filtered = filtered.filter(c => (c.progress_percent || 0) > 0 && (c.progress_percent || 0) < 100);
+                break;
+            case 'completed':
+                filtered = filtered.filter(c => (c.progress_percent || 0) === 100);
+                break;
+            case 'not-started':
+                filtered = filtered.filter(c => (c.progress_percent || 0) === 0);
+                break;
+            default:
+                break;
+        }
+        
+        if (filtered.length === 0) {
+            if (allCourses.length === 0) {
+                showEmptyState();
+            } else {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-filter"></i>
+                        <h3>No matching courses</h3>
+                        <p>Try changing your filter selection</p>
+                        <button class="btn btn-outline" onclick="resetFilters()">Reset Filters</button>
+                    </div>
+                `;
+            }
+            return;
+        }
+        
+        container.innerHTML = filtered.map(course => `
+            <div class="course-card" onclick="viewCourse(${course.id})">
+                <div class="course-image">
+                    <img src="${escapeHtml(course.image) || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400'}" alt="${escapeHtml(course.title)}">
+                    <span class="course-badge">${course.progress_percent || 0}%</span>
+                </div>
+                <div class="course-body">
+                    <h3 class="course-title">${escapeHtml(course.title)}</h3>
+                    <p class="course-description">${escapeHtml((course.description || 'Continue learning and improve your skills.').substring(0, 100))}${(course.description || '').length > 100 ? '...' : ''}</p>
+                    <div class="course-meta" style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                        <span><i class="fas fa-star" style="color: #fbbf24;"></i> ${course.rating || '4.8'}</span>
+                        <span><i class="fas fa-users"></i> ${(course.enrollments_count || 0).toLocaleString()} students</span>
+                    </div>
+                    <div class="course-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${course.progress_percent || 0}%"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span>Progress</span>
+                            <strong>${course.progress_percent || 0}%</strong>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline btn-sm" style="width: 100%; margin-top: 12px;">
+                        <i class="fas fa-play"></i> ${(course.progress_percent || 0) > 0 ? 'Continue Learning' : 'Start Course'}
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function resetFilters() {
+        currentFilter = 'all';
+        document.querySelectorAll('.filter-chip').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.filter === 'all') {
+                btn.classList.add('active');
+            }
+        });
+        displayCourses();
+    }
+    
+    function viewCourse(courseId) {
+        window.location.href = `course-details.html?id=${courseId}`;
+    }
+    
+    function initFilters() {
+        document.querySelectorAll('.filter-chip').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                displayCourses();
+            });
+        });
+    }
+    
+    function initSearch() {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                const term = e.target.value.toLowerCase();
+                const cards = document.querySelectorAll('.course-card');
+                cards.forEach(card => {
+                    const title = card.querySelector('.course-title')?.innerText.toLowerCase() || '';
+                    card.style.display = title.includes(term) ? '' : 'none';
+                });
+            });
+        }
+    }
+    
+    function initNavigation() {
+        document.querySelectorAll('.menu-item[data-page]').forEach(item => {
+            item.addEventListener('click', () => {
+                const page = item.dataset.page;
+                if (page === 'dashboard') window.location.href = 'dashboard.html';
+                else if (page === 'profile') window.location.href = 'profile.html';
+                else if (page === 'quizzes') window.location.href = 'quiz.html';
+                else if (page === 'messages') window.location.href = 'messages.html';
+            });
+        });
+        
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                localStorage.removeItem('edunova_token');
+                localStorage.removeItem('edunova_user');
+                window.location.href = 'login.html';
+            });
+        }
+    }
+    
+    function loadUserInfo() {
+        const storedUser = localStorage.getItem('edunova_user');
+        if (storedUser) {
+            try {
+                const user = JSON.parse(storedUser);
+                if (user.name) {
+                    document.getElementById('userName').innerText = user.name;
+                }
+                if (user.profile_image) {
+                    document.getElementById('profileImg').src = '../../' + user.profile_image;
+                }
+            } catch(e) {}
+        }
+    }
+    
+    function initSidebarClose() {
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.querySelector('.menu-toggle');
+            if (window.innerWidth <= 1024 && sidebar?.classList.contains('open')) {
+                if (!sidebar.contains(event.target) && !menuToggle?.contains(event.target)) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+    }
+    
+    function checkAuth() {
+        const token = localStorage.getItem('edunova_token');
+        if (!token) {
+            window.location.href = 'login.html';
+            return false;
+        }
+        return true;
+    }
+    
+    // Close modal on outside click
+    window.onclick = function(event) {
+        const modal = document.getElementById('notificationsModal');
+        if (event.target === modal) {
+            closeNotificationsModal();
+        }
+    }
+    
+    // Make functions global
+    window.toggleSidebar = toggleSidebar;
+    window.viewCourse = viewCourse;
+    window.resetFilters = resetFilters;
+    window.dismissNotice = dismissNotice;
+    window.openNotificationsModal = openNotificationsModal;
+    window.closeNotificationsModal = closeNotificationsModal;
+    window.markAllNotificationsRead = markAllNotificationsRead;
+    window.markNotificationRead = markNotificationRead;
+    window.viewAnnouncements = viewAnnouncements;
+    
+    // Initialize
+    async function init() {
+        if (!checkAuth()) return;
+        
+        loadUserInfo();
+        initFilters();
+        initSearch();
+        initNavigation();
+        initSidebarClose();
+        checkNoticeStatus();
+        
+        // Start rotating notice messages every 10 seconds
+        setInterval(rotateNoticeMessage, 10000);
+        
+        // Find working API base URL
+        API_BASE = await findWorkingApiBase();
+        
+        if (!API_BASE) {
+            console.error('Could not find working API endpoint');
+            showConnectionError();
+            return;
+        }
+        
+        console.log('✅ Using API Base URL:', API_BASE);
+        
+        await loadCourses();
+        await loadNotifications();
+        await loadUnreadMessages();
+        await loadLatestAnnouncement();
+    }
+    
+    init();
+</script>
+
+<style>
+    .upgrade-card {
+        background: white;
+        border-radius: var(--radius-xl);
+        padding: 20px;
+        margin-top: 30px;
+        text-align: center;
+    }
+    .upgrade-card h3 {
+        font-size: 1.125rem;
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .upgrade-card p {
+        font-size: 0.75rem;
+        color: var(--gray);
+        margin-bottom: 15px;
+    }
+    .upgrade-card img {
+        width: 100px;
+        margin-top: 15px;
+    }
+    .error-state {
+        text-align: center;
+        padding: 60px;
+        background: white;
+        border-radius: var(--radius-xl);
+    }
+    .error-state i {
+        font-size: 4rem;
+        color: #ef4444;
+        margin-bottom: 20px;
+    }
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+    .modal-content {
+        background: white;
+        border-radius: var(--radius-xl);
+        margin: 20px;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    .modal-header {
+        padding: 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .close-modal {
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--gray);
+    }
+    .activity-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px 20px;
+        border-bottom: 1px solid var(--border);
+    }
+    .activity-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .activity-content {
+        flex: 1;
+    }
+    .activity-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+    .activity-time {
+        font-size: 0.7rem;
+        color: var(--gray);
+    }
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+    }
+</style>
+
+</body>
+</html>

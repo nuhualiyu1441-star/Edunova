@@ -1,0 +1,79 @@
+2026-06-08 20:58:17 - Unauthorized access attempt
+2026-06-08 22:02:55 - Error [2] Undefined variable $db in C:\xampp\htdocs\edunova\api\students\upload_profile.php on line 52
+2026-06-08 22:02:55 - Exception: Call to a member function prepare() on null in C:\xampp\htdocs\edunova\api\students\upload_profile.php on line 52
+2026-06-08 22:06:05 - Error [2] Undefined variable $db in C:\xampp\htdocs\edunova\api\students\upload_profile.php on line 52
+2026-06-08 22:06:05 - Exception: Call to a member function prepare() on null in C:\xampp\htdocs\edunova\api\students\upload_profile.php on line 52
+2026-06-09 00:37:00 - Error [2] Undefined variable $db in C:\xampp\htdocs\edunova\api\students\upload_profile.php on line 52
+2026-06-09 00:37:00 - Exception: Call to a member function prepare() on null in C:\xampp\htdocs\edunova\api\students\upload_profile.php on line 52
+2026-06-09 01:57:31 - Forbidden admin access attempt by user: 4
+2026-06-09 01:58:32 - Forbidden admin access attempt by user: 4
+2026-06-09 01:58:34 - Forbidden admin access attempt by user: 4
+2026-06-09 02:03:33 - Forbidden admin access attempt by user: 4
+2026-06-09 02:04:25 - Forbidden admin access attempt by user: 4
+2026-06-09 02:08:48 - Forbidden admin access attempt by user: 4
+2026-06-09 02:09:07 - Forbidden admin access attempt by user: 4
+2026-06-09 02:18:07 - Forbidden admin access attempt by user: 4
+2026-06-09 02:18:13 - Forbidden admin access attempt by user: 4
+2026-06-09 02:18:43 - Forbidden admin access attempt by user: 4
+2026-06-09 02:18:53 - Forbidden admin access attempt by user: 4
+2026-06-09 02:20:15 - Forbidden admin access attempt by user: 4
+2026-06-09 02:21:31 - Forbidden admin access attempt by user: 4
+2026-06-09 02:21:46 - Forbidden admin access attempt by user: 4
+2026-06-09 02:22:27 - Forbidden admin access attempt by user: 4
+2026-06-09 02:22:27 - Forbidden admin access attempt by user: 4
+2026-06-09 02:22:39 - Forbidden admin access attempt by user: 4
+2026-06-09 02:22:57 - Forbidden admin access attempt by user: 4
+2026-06-09 02:23:00 - Forbidden admin access attempt by user: 4
+2026-06-09 02:23:14 - Forbidden admin access attempt by user: 4
+2026-06-09 02:23:32 - Forbidden admin access attempt by user: 4
+2026-06-09 02:23:40 - Forbidden admin access attempt by user: 4
+2026-06-09 02:23:55 - Forbidden admin access attempt by user: 4
+2026-06-09 03:09:42 - Forbidden admin access attempt by user: 5
+2026-06-09 03:10:05 - Forbidden admin access attempt by user: 5
+2026-06-09 03:34:55 - Forbidden admin access attempt by user: 4
+2026-06-09 23:05:44 - Unauthorized access attempt
+2026-06-09 23:06:05 - Unauthorized access attempt
+2026-06-09 23:06:34 - Unauthorized access attempt
+2026-06-09 23:17:44 - Unauthorized access attempt
+2026-06-09 23:29:44 - Unauthorized access attempt
+2026-06-09 23:40:33 - Forbidden admin access attempt by user: 6
+2026-06-09 23:42:51 - Forbidden admin access attempt by user: 6
+2026-06-11 14:21:25 - Forbidden admin access attempt by user: 4
+2026-06-11 14:21:53 - Forbidden admin access attempt by user: 4
+2026-06-11 14:21:58 - Forbidden admin access attempt by user: 4
+2026-06-11 14:38:49 - Forbidden admin access attempt by user: 4
+2026-06-11 15:14:32 - Exception: Call to private Database::__construct() from global scope in C:\xampp\htdocs\edunova\api\auth\login.php on line 22
+2026-06-11 15:15:52 - Exception: Call to private Database::__construct() from global scope in C:\xampp\htdocs\edunova\api\auth\login.php on line 22
+2026-06-11 15:18:24 - Database Error: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it
+2026-06-11 15:18:24 - Exception: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it in C:\xampp\htdocs\edunova\api\config\database.php on line 66
+2026-06-11 15:19:04 - Database Error: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it
+2026-06-11 15:19:04 - Exception: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it in C:\xampp\htdocs\edunova\api\config\database.php on line 66
+2026-06-11 15:29:23 - Database Error: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it
+[11-Jun-2026 15:29:23 Africa/Lagos] Database error: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it
+2026-06-11 15:30:00 - Database Error: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it
+[11-Jun-2026 15:30:00 Africa/Lagos] Database error: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it
+2026-06-11 15:30:11 - Database Error: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it
+[11-Jun-2026 15:30:11 Africa/Lagos] Database error: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it
+2026-06-11 15:38:00 - Forbidden admin access attempt by user: 7
+2026-06-11 15:39:08 - Unauthorized access attempt
+2026-06-11 15:39:08 - Unauthorized access attempt
+2026-06-11 15:39:34 - Unauthorized access attempt
+2026-06-11 15:39:34 - Unauthorized access attempt
+2026-06-11 19:35:33 - Unauthorized access attempt
+2026-06-11 19:39:44 - Unauthorized access attempt
+2026-06-11 19:47:30 - Unauthorized access attempt
+2026-06-11 19:51:44 - Unauthorized access attempt
+2026-06-11 19:51:50 - Unauthorized access attempt
+2026-06-11 19:51:50 - Unauthorized access attempt
+2026-06-11 19:51:50 - Unauthorized access attempt
+2026-06-11 19:51:58 - Unauthorized access attempt
+2026-06-11 19:51:58 - Unauthorized access attempt
+2026-06-11 20:13:19 - Unauthorized access attempt
+2026-06-11 20:13:19 - Unauthorized access attempt
+2026-06-11 20:13:19 - Unauthorized access attempt
+2026-06-11 20:13:33 - Unauthorized access attempt
+2026-06-11 20:13:33 - Unauthorized access attempt
+2026-06-11 20:13:33 - Unauthorized access attempt
+2026-06-11 20:32:09 - Unauthorized access attempt
+2026-06-11 20:32:09 - Unauthorized access attempt
+2026-06-11 20:32:09 - Unauthorized access attempt
